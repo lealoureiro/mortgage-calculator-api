@@ -1,9 +1,9 @@
 package main
 
 import (
+	"./model"
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/lealoureiro/mortgage-calculator/model"
 	"log"
 	"net/http"
 	"os"
@@ -53,6 +53,7 @@ func showInfo(w http.ResponseWriter, r *http.Request) {
 
 	if !isClientAcceptingJSON(r) {
 		respondHTTPError(406, "Unsupported media!", w)
+		return
 	}
 
 	m := map[string]string{"applicationName": "Mortgage Calculator", "applicationVersion": "0.0.1"}
