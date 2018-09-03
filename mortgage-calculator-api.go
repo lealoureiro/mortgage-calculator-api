@@ -30,7 +30,7 @@ func monthlyPayments(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Calculation montly payments client to: %s", r.RemoteAddr)
 
-	if !isMonthlyPaymentRequestValid(w, r) {
+	if !isMonthlyPaymentsRequestValid(w, r) {
 		return
 	}
 
@@ -63,7 +63,7 @@ func showInfo(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(j))
 }
 
-func isMonthlyPaymentRequestValid(w http.ResponseWriter, r *http.Request) bool {
+func isMonthlyPaymentsRequestValid(w http.ResponseWriter, r *http.Request) bool {
 
 	if !isContentTypeJSON(r) {
 		respondHTTPError(415, "Unsupported Media Type", w)

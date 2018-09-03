@@ -1,1 +1,1 @@
-web: bin/mortgage-calculator
+web: bin/mortgage-calculator-api
