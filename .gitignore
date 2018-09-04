@@ -5,3 +5,4 @@
 !.elasticbeanstalk/*.global.yml
 bin/
 .idea/
+.DS_Store
