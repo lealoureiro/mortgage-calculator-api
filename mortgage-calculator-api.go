@@ -1,13 +1,17 @@
 package main
 
 import (
-	"./model"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/lealoureiro/mortgage-calculator-api/model"
 	"log"
 	"net/http"
 	"os"
 )
+
+type CORSEnabledRouter struct {
+	r *mux.Router
+}
 
 func main() {
 
@@ -19,11 +23,28 @@ func main() {
 
 	log.Printf("Starting application on port: %s", port)
 
-	router := mux.NewRouter()
-	router.HandleFunc("/info", showInfo).Methods("GET")
-	router.HandleFunc("/monthly-payments", monthlyPayments).Methods("POST")
+	r := mux.NewRouter()
+	r.HandleFunc("/info", showInfo).Methods("GET")
+	r.HandleFunc("/monthly-payments", monthlyPayments).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(":"+port, router))
+	http.Handle("/", &CORSEnabledRouter{r})
+	http.ListenAndServe(":"+port, nil)
+}
+
+func (s *CORSEnabledRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+	if origin := r.Header.Get("Origin"); origin != "" {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers",
+			"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+	}
+
+	if r.Method == "OPTIONS" {
+		return
+	}
+
+	s.r.ServeHTTP(w, r)
 }
 
 func monthlyPayments(w http.ResponseWriter, r *http.Request) {
