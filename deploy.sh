@@ -9,5 +9,5 @@ zip -r AppBundle.zip Procfile ./bin/mortgage-calculator-api
 echo "Deploying to AWS Elastic Beanstalk..."
 eb deploy mortgage-calculator-api
 
-echo "Cleaning deploying files..."
+echo "Cleaning deployment files..."
 rm -rv AppBundle.zip
