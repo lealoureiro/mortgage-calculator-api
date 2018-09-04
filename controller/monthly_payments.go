@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"github.com/lealoureiro/mortgage-calculator-api/model"
+	"github.com/lealoureiro/mortgage-calculator-api/monthlypayments"
 	"github.com/lealoureiro/mortgage-calculator-api/utils"
 	"log"
 	"net/http"
@@ -26,7 +27,16 @@ func MonthlyPayments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Calculating monthly payments for %.2f for property with market value %.2f to be paid in %d months.", rb.InitialPrincipal, rb.MarketValue, rb.Months)
+	log.Printf("Calculating monthly payments for %.2f for property with market value %.2f to be paid in %d months with Interest tiers %v", rb.InitialPrincipal, rb.MarketValue, rb.Months, rb.InterestTiers)
+
+	mps := monthlypayments.CalculateLinearMonthlyPayments(rb)
+
+	mpsJson, _ := json.Marshal(mps)
+
+	w.Header().Set("Content-Type", "application/json")
+
+	w.Write(mpsJson)
+
 }
 
 func isMonthlyPaymentsRequestValid(w http.ResponseWriter, r *http.Request) bool {
