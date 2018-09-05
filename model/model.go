@@ -1,5 +1,7 @@
 package model
 
+import "github.com/strongo/decimal"
+
 type MonthlyPaymentRequest struct {
 	InitialPrincipal float64
 	MarketValue      float64
@@ -14,16 +16,16 @@ type InterestTier struct {
 }
 
 type MonthPayment struct {
-	GrossAmount         float64
-	InterestAmountGross float64
-	InterestPercentage  float64
-	RemainingAmount     float64
-	TotalGross          float64
-	TotalNet            float64
+	Repayment           decimal.Decimal64p2 `json:"repayment"`
+	InterestAmountGross decimal.Decimal64p2 `json:"interestAmountGross"`
+	InterestPercentage  float64             `json:"interestPercentage"`
+	Principal           decimal.Decimal64p2 `json:"principal"`
+	TotalGross          decimal.Decimal64p2 `json:"totalGross"`
+	TotalNet            decimal.Decimal64p2 `json:"totalNet"`
 }
 
 type MonthlyPayments struct {
-	Payments           []MonthPayment
-	TotalGrossInterest float64
-	TotalNetInterest   float64
+	Payments           []MonthPayment      `json:"payments"`
+	TotalGrossInterest decimal.Decimal64p2 `json:"totalGrossInterest"`
+	TotalNetInterest   decimal.Decimal64p2 `json:"totalNetInterest"`
 }

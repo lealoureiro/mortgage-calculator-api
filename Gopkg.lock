@@ -17,9 +17,20 @@
   revision = "e3702bed27f0d39777b0b37b664b6280e8ef8fbf"
   version = "v1.6.2"
 
+[[projects]]
+  branch = "master"
+  digest = "1:17b6e5bac3721e1bc2b4a1a088766ecc88e2817e171da1fbf5193e2f809d58de"
+  name = "github.com/strongo/decimal"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a1521d8f65fa82338358ea7cd407b7bb9b1a9884"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/gorilla/mux"]
+  input-imports = [
+    "github.com/gorilla/mux",
+    "github.com/strongo/decimal",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

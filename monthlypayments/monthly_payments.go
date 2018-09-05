@@ -1,48 +1,56 @@
 package monthlypayments
 
-import "github.com/lealoureiro/mortgage-calculator-api/model"
+import (
+	"github.com/lealoureiro/mortgage-calculator-api/model"
+	"github.com/strongo/decimal"
+)
 
 func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.MonthlyPayments {
 
 	result := make([]model.MonthPayment, 0, r.Months)
 
 	monthlyRepayment := r.InitialPrincipal / float64(r.Months)
-	remainingAmount := r.InitialPrincipal
+	principal := r.InitialPrincipal
+
+	interestPercentage := 0.0
+	interestAmountGross := 0.0
+	interestAmountNet := 0.0
 
 	totalGrossInterest := 0.0
 	totalNetInterest := 0.0
 
 	incomeTax := float64(r.IncomeTax) / 100.0
 
-	for i := 0; i < r.Months && remainingAmount > 0; i++ {
+	for i := 0; i < r.Months && principal > 0; i++ {
 
-		if remainingAmount < monthlyRepayment {
-			monthlyRepayment = remainingAmount
+		if principal < monthlyRepayment {
+			monthlyRepayment = principal
 		}
+
+		interestPercentage = r.InterestTiers[0].Interest / 100
+		interestAmountGross = (principal * interestPercentage) / 12.0
+		interestAmountNet = interestAmountGross - (interestAmountGross * incomeTax)
+
+		totalGrossInterest += interestAmountGross
+		totalNetInterest += interestAmountNet
 
 		var payment = model.MonthPayment{}
 
-		interestPercentage := r.InterestTiers[0].Interest / 100
-
-		payment.GrossAmount = monthlyRepayment
+		payment.Repayment = decimal.NewDecimal64p2FromFloat64(monthlyRepayment)
+		payment.InterestAmountGross = decimal.NewDecimal64p2FromFloat64(interestAmountGross)
+		payment.Principal = decimal.NewDecimal64p2FromFloat64(principal)
 		payment.InterestPercentage = interestPercentage
-		payment.InterestAmountGross = (remainingAmount * interestPercentage) / 12.0
-
-		interestAmountNet := payment.InterestAmountGross - (payment.InterestAmountGross * incomeTax)
-
-		payment.TotalGross = payment.InterestAmountGross + monthlyRepayment
-		payment.TotalNet = monthlyRepayment + interestAmountNet
-
-		totalGrossInterest += payment.InterestAmountGross
-		totalNetInterest += interestAmountNet
-
-		payment.RemainingAmount = remainingAmount
+		payment.TotalGross = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + interestAmountGross)
+		payment.TotalNet = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + interestAmountNet)
 
 		result = append(result, payment)
 
-		remainingAmount -= monthlyRepayment
+		principal -= monthlyRepayment
 
 	}
 
-	return model.MonthlyPayments{Payments: result, TotalGrossInterest: totalGrossInterest, TotalNetInterest: totalNetInterest}
+	return model.MonthlyPayments{
+		Payments:           result,
+		TotalGrossInterest: decimal.NewDecimal64p2FromFloat64(totalGrossInterest),
+		TotalNetInterest:   decimal.NewDecimal64p2FromFloat64(totalNetInterest)}
 }

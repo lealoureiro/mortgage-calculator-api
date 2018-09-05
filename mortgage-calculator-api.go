@@ -43,5 +43,8 @@ func (s *CORSEnabledRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+
 	s.r.ServeHTTP(w, r)
+
 }
