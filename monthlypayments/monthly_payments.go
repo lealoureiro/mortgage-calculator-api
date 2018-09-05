@@ -60,6 +60,10 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.Monthly
 
 func ValidateInputData(r model.MonthlyPaymentRequest) (bool, string) {
 
+	if len(r.InterestTiers) == 0 {
+		return false, "No interest tiers provided!"
+	}
+
 	sort.Slice(r.InterestTiers[:], func(i, j int) bool {
 		return r.InterestTiers[i].Percentage < r.InterestTiers[j].Percentage
 	})
@@ -68,7 +72,7 @@ func ValidateInputData(r model.MonthlyPaymentRequest) (bool, string) {
 	initialRatio := r.InitialPrincipal / r.MarketValue
 
 	if initialRatio > initialTierPercentage {
-		return false, fmt.Sprintf("No interest tier found for initial percentage of %.2f %", initialRatio*100)
+		return false, fmt.Sprintf("No interest tier found for initial percentage of %.2f %%", initialRatio*100)
 	}
 
 	return true, ""
