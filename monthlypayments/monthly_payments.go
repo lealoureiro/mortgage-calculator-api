@@ -13,8 +13,8 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.Monthly
 	principal := r.InitialPrincipal
 
 	interestPercentage := 0.0
-	interestAmountGross := 0.0
-	interestAmountNet := 0.0
+	interestGrossAmount := 0.0
+	interestNetAmount := 0.0
 
 	totalGrossInterest := 0.0
 	totalNetInterest := 0.0
@@ -28,20 +28,21 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.Monthly
 		}
 
 		interestPercentage = r.InterestTiers[0].Interest / 100
-		interestAmountGross = (principal * interestPercentage) / 12.0
-		interestAmountNet = interestAmountGross - (interestAmountGross * incomeTax)
+		interestGrossAmount = (principal * interestPercentage) / 12.0
+		interestNetAmount = interestGrossAmount - (interestGrossAmount * incomeTax)
 
-		totalGrossInterest += interestAmountGross
-		totalNetInterest += interestAmountNet
+		totalGrossInterest += interestGrossAmount
+		totalNetInterest += interestNetAmount
 
 		var payment = model.MonthPayment{}
 
 		payment.Repayment = decimal.NewDecimal64p2FromFloat64(monthlyRepayment)
-		payment.InterestAmountGross = decimal.NewDecimal64p2FromFloat64(interestAmountGross)
+		payment.InterestGrossAmount = decimal.NewDecimal64p2FromFloat64(interestGrossAmount)
+		payment.InterestNetAmount = decimal.NewDecimal64p2FromFloat64(interestNetAmount)
 		payment.Principal = decimal.NewDecimal64p2FromFloat64(principal)
-		payment.InterestPercentage = interestPercentage
-		payment.TotalGross = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + interestAmountGross)
-		payment.TotalNet = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + interestAmountNet)
+		payment.InterestPercentage = interestPercentage * 100
+		payment.TotalGross = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + interestGrossAmount)
+		payment.TotalNet = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + interestNetAmount)
 
 		result = append(result, payment)
 

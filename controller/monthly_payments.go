@@ -33,6 +33,8 @@ func MonthlyPayments(w http.ResponseWriter, r *http.Request) {
 
 	mpsJson, _ := json.Marshal(mps)
 
+	w.Header().Set("Content-Type", "application/json")
+
 	w.Write(mpsJson)
 
 }
@@ -41,11 +43,6 @@ func isMonthlyPaymentsRequestValid(w http.ResponseWriter, r *http.Request) bool 
 
 	if !utils.IsContentTypeJSON(r) {
 		utils.RespondHTTPError(415, "Unsupported Media Type", w)
-		return false
-	}
-
-	if !utils.IsClientAcceptingJSON(r) {
-		utils.RespondHTTPError(406, "Unsupported media!", w)
 		return false
 	}
 

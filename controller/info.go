@@ -19,5 +19,7 @@ func ShowInfo(w http.ResponseWriter, r *http.Request) {
 	m := map[string]string{"applicationName": "Mortgage Calculator", "applicationVersion": "0.0.1"}
 	j, _ := json.Marshal(m)
 
+	w.Header().Set("Content-Type", "application/json")
+
 	w.Write([]byte(j))
 }

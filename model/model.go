@@ -17,7 +17,8 @@ type InterestTier struct {
 
 type MonthPayment struct {
 	Repayment           decimal.Decimal64p2 `json:"repayment"`
-	InterestAmountGross decimal.Decimal64p2 `json:"interestAmountGross"`
+	InterestGrossAmount decimal.Decimal64p2 `json:"interestGrossAmount"`
+	InterestNetAmount   decimal.Decimal64p2 `json:"interestNetAmount"`
 	InterestPercentage  float64             `json:"interestPercentage"`
 	Principal           decimal.Decimal64p2 `json:"principal"`
 	TotalGross          decimal.Decimal64p2 `json:"totalGross"`
