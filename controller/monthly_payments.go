@@ -27,6 +27,13 @@ func MonthlyPayments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	valid, err2 := monthlypayments.ValidateInputData(rb)
+
+	if !valid {
+		utils.RespondHTTPError(400, err2, w)
+		return
+	}
+
 	log.Printf("Calculating monthly payments for %.2f for property with market value %.2f to be paid in %d months with Interest tiers %v", rb.InitialPrincipal, rb.MarketValue, rb.Months, rb.InterestTiers)
 
 	mps := monthlypayments.CalculateLinearMonthlyPayments(rb)

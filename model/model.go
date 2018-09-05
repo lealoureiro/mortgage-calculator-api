@@ -11,7 +11,7 @@ type MonthlyPaymentRequest struct {
 }
 
 type InterestTier struct {
-	Percentage int
+	Percentage float64
 	Interest   float64
 }
 
