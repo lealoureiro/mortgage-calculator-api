@@ -38,6 +38,7 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.Monthly
 
 		var payment = model.MonthPayment{}
 
+		payment.Month = i
 		payment.Repayment = decimal.NewDecimal64p2FromFloat64(monthlyRepayment)
 		payment.InterestGrossAmount = decimal.NewDecimal64p2FromFloat64(interestGrossAmount)
 		payment.InterestNetAmount = decimal.NewDecimal64p2FromFloat64(interestNetAmount)
@@ -49,6 +50,8 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.Monthly
 		result = append(result, payment)
 
 		principal -= monthlyRepayment
+
+		processExtraRepayments(r.Repayments, i, &principal)
 
 	}
 
@@ -89,4 +92,18 @@ func getInterestTierPercentage(m float64, p float64, l []model.InterestTier) flo
 	}
 
 	return 0.0
+}
+
+func processExtraRepayments(rp []model.Repayment, m int, p *float64) {
+
+	if rp == nil || len(rp) == 0 {
+		return
+	}
+
+	for _, e := range rp {
+		if e.Month == m {
+			*p -= e.Amount
+		}
+	}
+
 }

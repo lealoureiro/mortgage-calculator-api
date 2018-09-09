@@ -8,6 +8,7 @@ type MonthlyPaymentRequest struct {
 	Months           int
 	IncomeTax        int
 	InterestTiers    []InterestTier
+	Repayments       []Repayment
 }
 
 type InterestTier struct {
@@ -15,7 +16,13 @@ type InterestTier struct {
 	Interest   float64
 }
 
+type Repayment struct {
+	Month  int
+	Amount float64
+}
+
 type MonthPayment struct {
+	Month               int                 `json:"month"`
 	Repayment           decimal.Decimal64p2 `json:"repayment"`
 	InterestGrossAmount decimal.Decimal64p2 `json:"interestGrossAmount"`
 	InterestNetAmount   decimal.Decimal64p2 `json:"interestNetAmount"`
