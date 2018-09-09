@@ -78,6 +78,10 @@ func ValidateInputData(r model.MonthlyPaymentRequest) (bool, string) {
 		return false, fmt.Sprintf("No interest tier found for initial percentage of %.2f %%", initialRatio*100)
 	}
 
+	if r.IncomeTax < 0 || r.IncomeTax > 100 {
+		return false, "Income tax should be between 0% and 100%!"
+	}
+
 	return true, ""
 }
 
