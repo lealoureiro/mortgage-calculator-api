@@ -23,7 +23,7 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.Monthly
 
 	incomeTax := float64(r.IncomeTax) / 100.0
 
-	for i := 0; i < r.Months && principal > 0; i++ {
+	for i := 1; i <= r.Months && principal > 0; i++ {
 
 		if principal < monthlyRepayment {
 			monthlyRepayment = principal
