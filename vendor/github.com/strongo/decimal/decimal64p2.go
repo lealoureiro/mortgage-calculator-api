@@ -12,7 +12,7 @@ type Decimal64p2 int64
 
 // PRECISION_2 defines fixed precision with 2 digits after point
 const (
-	PRECISION_2  = 2
+	PRECISION_2 = 2
 	POINT_PART_2 = 100
 )
 
