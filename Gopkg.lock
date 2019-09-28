@@ -18,6 +18,22 @@
   version = "v1.6.2"
 
 [[projects]]
+  digest = "1:31e761d97c76151dde79e9d28964a812c46efc5baee4085b86f68f0c654450de"
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e"
+  version = "v1.0.2"
+
+[[projects]]
+  digest = "1:04457f9f6f3ffc5fea48e71d62f2ca256637dee0a04d710288e27e05c8b41976"
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "839c75faf7f98a33d445d181f3018b5c3409a45e"
+  version = "v1.4.2"
+
+[[projects]]
   branch = "master"
   digest = "1:17b6e5bac3721e1bc2b4a1a088766ecc88e2817e171da1fbf5193e2f809d58de"
   name = "github.com/strongo/decimal"
@@ -25,11 +41,20 @@
   pruneopts = "UT"
   revision = "a1521d8f65fa82338358ea7cd407b7bb9b1a9884"
 
+[[projects]]
+  branch = "master"
+  digest = "1:1b90e63244513e8514749f45da58e89350d35cb3e12416ce6ed95f41c2a1f177"
+  name = "golang.org/x/sys"
+  packages = ["unix"]
+  pruneopts = "UT"
+  revision = "c990c680b611ac1aeb7d8f2af94a825f98d69720"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
     "github.com/gorilla/mux",
+    "github.com/sirupsen/logrus",
     "github.com/strongo/decimal",
   ]
   solver-name = "gps-cdcl"

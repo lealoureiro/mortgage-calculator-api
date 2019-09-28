@@ -2,9 +2,10 @@ package controller
 
 import (
 	"encoding/json"
-	"github.com/lealoureiro/mortgage-calculator-api/utils"
-	"log"
 	"net/http"
+
+	"github.com/lealoureiro/mortgage-calculator-api/utils"
+	log "github.com/sirupsen/logrus"
 )
 
 func ShowInfo(w http.ResponseWriter, r *http.Request) {

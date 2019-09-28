@@ -1,13 +1,15 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/lealoureiro/mortgage-calculator-api/controller"
-	"log"
 	"net/http"
 	"os"
+
+	"github.com/gorilla/mux"
+	"github.com/lealoureiro/mortgage-calculator-api/controller"
+	log "github.com/sirupsen/logrus"
 )
 
+// Router to add CORS headers
 type CORSEnabledRouter struct {
 	r *mux.Router
 }
@@ -20,6 +22,10 @@ func main() {
 		port = "5000"
 	}
 
+	log.SetFormatter(&log.TextFormatter{
+		FullTimestamp: true,
+	})
+
 	log.Printf("Starting application on port: %s", port)
 
 	r := mux.NewRouter()
@@ -30,6 +36,7 @@ func main() {
 	http.ListenAndServe(":"+port, nil)
 }
 
+// function to add CORS headers
 func (s *CORSEnabledRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if origin := r.Header.Get("Origin"); origin != "" {

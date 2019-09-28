@@ -2,11 +2,12 @@ package controller
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/lealoureiro/mortgage-calculator-api/model"
 	"github.com/lealoureiro/mortgage-calculator-api/monthlypayments"
 	"github.com/lealoureiro/mortgage-calculator-api/utils"
-	"log"
-	"net/http"
+	log "github.com/sirupsen/logrus"
 )
 
 func MonthlyPayments(w http.ResponseWriter, r *http.Request) {
