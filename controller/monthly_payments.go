@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// REST resource to calculate Monthly Payments
 func MonthlyPayments(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Calculation montly payments client to: %s", r.RemoteAddr)
@@ -31,6 +32,7 @@ func MonthlyPayments(w http.ResponseWriter, r *http.Request) {
 	valid, err2 := monthlypayments.ValidateInputData(rb)
 
 	if !valid {
+		log.Printf("Failed to validate input data, reason: %s", err2)
 		utils.RespondHTTPError(400, err2, w)
 		return
 	}
@@ -39,11 +41,11 @@ func MonthlyPayments(w http.ResponseWriter, r *http.Request) {
 
 	mps := monthlypayments.CalculateLinearMonthlyPayments(rb)
 
-	mpsJson, _ := json.Marshal(mps)
+	mpsJSON, _ := json.Marshal(mps)
 
 	w.Header().Set("Content-Type", "application/json")
 
-	w.Write(mpsJson)
+	w.Write(mpsJSON)
 
 }
 
