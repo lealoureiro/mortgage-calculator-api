@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// RespondHTTPError : respond an error code
 func RespondHTTPError(c int, m string, w http.ResponseWriter) {
 
 	data := map[string]string{"errorMessage": m}

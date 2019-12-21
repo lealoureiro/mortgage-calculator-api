@@ -10,7 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// REST resource to calculate Monthly Payments
+// MonthlyPayments : REST resource to calculate Mortgage Monthly Payments
 func MonthlyPayments(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Calculation montly payments client to: %s", r.RemoteAddr)

@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// ShowInfo : create server info response
 func ShowInfo(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Show application information to: %s", r.RemoteAddr)

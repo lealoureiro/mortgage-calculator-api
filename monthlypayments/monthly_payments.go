@@ -8,6 +8,7 @@ import (
 	"github.com/strongo/decimal"
 )
 
+// CalculateLinearMonthlyPayments : calculate the monthly payments for a Linear Mortgage
 func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.MonthlyPayments {
 
 	result := make([]model.MonthPayment, 0, r.Months)
@@ -62,6 +63,7 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.Monthly
 		TotalNetInterest:   decimal.NewDecimal64p2FromFloat64(totalNetInterest)}
 }
 
+// ValidateInputData : validate the input data request to calculate Mortgage Monthly payments
 func ValidateInputData(r model.MonthlyPaymentRequest) (bool, string) {
 
 	if len(r.InterestTiers) == 0 {

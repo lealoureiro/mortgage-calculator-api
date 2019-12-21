@@ -2,6 +2,7 @@ package model
 
 import "github.com/strongo/decimal"
 
+// MonthlyPaymentRequest : calculate monthly payment request object
 type MonthlyPaymentRequest struct {
 	InitialPrincipal float64
 	MarketValue      float64
@@ -11,16 +12,19 @@ type MonthlyPaymentRequest struct {
 	Repayments       []Repayment
 }
 
+// InterestTier : Represents a Interest Tier aka ‘loan-to-value ratio’
 type InterestTier struct {
 	Percentage float64
 	Interest   float64
 }
 
+// Repayment : a extra repayment during the mortgage period
 type Repayment struct {
 	Month  int
 	Amount float64
 }
 
+// MonthPayment : a Mortgage monthly payment
 type MonthPayment struct {
 	Month               int                 `json:"month"`
 	Repayment           decimal.Decimal64p2 `json:"repayment"`
@@ -32,6 +36,7 @@ type MonthPayment struct {
 	TotalNet            decimal.Decimal64p2 `json:"totalNet"`
 }
 
+// MonthlyPayments : the response model of Mortgage monthly payments operation
 type MonthlyPayments struct {
 	Payments           []MonthPayment      `json:"payments"`
 	TotalGrossInterest decimal.Decimal64p2 `json:"totalGrossInterest"`
