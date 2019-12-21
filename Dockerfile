@@ -2,7 +2,7 @@ FROM golang:1.13.5-alpine3.10 as builder
 
 RUN apk update && apk upgrade && apk add --no-cache git dep
 
-LABEL maintainer="Leandro Loureiro <leandroloureiro@protonmail.com>"
+LABEL maintainer="Leandro Loureiro <leandroloureiro@pm.me>"
 
 WORKDIR $GOPATH/src/github.com/lealoureiro/mortgage-calculator-api
 
