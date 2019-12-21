@@ -2,9 +2,10 @@ package monthlypayments
 
 import (
 	"fmt"
+	"sort"
+
 	"github.com/lealoureiro/mortgage-calculator-api/model"
 	"github.com/strongo/decimal"
-	"sort"
 )
 
 func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.MonthlyPayments {
@@ -43,7 +44,7 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.Monthly
 		payment.InterestGrossAmount = decimal.NewDecimal64p2FromFloat64(interestGrossAmount)
 		payment.InterestNetAmount = decimal.NewDecimal64p2FromFloat64(interestNetAmount)
 		payment.Principal = decimal.NewDecimal64p2FromFloat64(principal)
-		payment.InterestPercentage = interestPercentage * 100
+		payment.InterestPercentage = decimal.NewDecimal64p2FromFloat64(interestPercentage * 100)
 		payment.TotalGross = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + interestGrossAmount)
 		payment.TotalNet = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + interestNetAmount)
 
