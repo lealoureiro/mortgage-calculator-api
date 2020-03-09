@@ -11,7 +11,6 @@ At moment only supports to calculate the monthly payments of Linear Mortgage off
 
 ## Run
 ```bash
-dep ensure
 go run mortgage-calculator-api.go
 ```
 
