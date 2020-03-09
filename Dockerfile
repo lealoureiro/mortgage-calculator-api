@@ -1,6 +1,4 @@
-FROM golang:1.13.5-alpine3.10 as builder
-
-RUN apk update && apk upgrade && apk add --no-cache git dep
+FROM golang:1.14-alpine3.11 as builder
 
 LABEL maintainer="Leandro Loureiro <leandroloureiro@pm.me>"
 
@@ -11,9 +9,7 @@ COPY model model
 COPY monthlypayments monthlypayments
 COPY utils utils
 COPY mortgage-calculator-api.go .
-COPY Gopkg.toml .
-
-RUN dep ensure
+COPY go.mod .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/mortgage-calculator-api .
 
