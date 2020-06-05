@@ -9,7 +9,7 @@ import (
 )
 
 // CalculateLinearMonthlyPayments : calculate the monthly payments for a Linear Mortgage
-func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.MonthlyPayments {
+func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.MonthlyPayments {
 
 	result := make([]model.MonthPayment, 0, r.Months)
 
@@ -31,7 +31,12 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.Monthly
 			monthlyRepayment = principal
 		}
 
-		interestPercentage = getInterestTierPercentage(r.MarketValue, principal, r.InterestTiers) / 100
+		if r.AutomaticInterestUpdate {
+			interestPercentage = getLoanToValueInterest(r.MarketValue, principal, r.LoanToValueInterestTiers)
+		} else {
+			interestPercentage = getLatestInterestUpdate(i, r.InterestTierUpdates)
+		}
+
 		interestGrossAmount = (principal * interestPercentage) / 12.0
 		interestNetAmount = interestGrossAmount - (interestGrossAmount * incomeTax)
 
@@ -64,21 +69,39 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentRequest) model.Monthly
 }
 
 // ValidateInputData : validate the input data request to calculate Mortgage Monthly payments
-func ValidateInputData(r model.MonthlyPaymentRequest) (bool, string) {
+func ValidateInputData(r model.MonthlyPaymentsRequest) (bool, string) {
 
-	if len(r.InterestTiers) == 0 {
-		return false, "No interest tiers provided!"
+	if r.AutomaticInterestUpdate && len(r.LoanToValueInterestTiers) == 0 {
+		return false, "No loan to value interest tiers provided!"
 	}
 
-	sort.Slice(r.InterestTiers[:], func(i, j int) bool {
-		return r.InterestTiers[i].Percentage < r.InterestTiers[j].Percentage
-	})
+	if !r.AutomaticInterestUpdate && len(r.InterestTierUpdates) == 0 {
+		return false, "No interest tiers month updates provided!"
+	}
 
-	initialTierPercentage := r.InterestTiers[len(r.InterestTiers)-1].Percentage / 100
-	initialRatio := r.InitialPrincipal / r.MarketValue
+	if r.AutomaticInterestUpdate {
 
-	if initialRatio > initialTierPercentage {
-		return false, fmt.Sprintf("No interest tier found for initial percentage of %.2f %%", initialRatio*100)
+		sort.Slice(r.LoanToValueInterestTiers[:], func(i, j int) bool {
+			return r.LoanToValueInterestTiers[i].Percentage < r.LoanToValueInterestTiers[j].Percentage
+		})
+
+		initialTierPercentage := r.LoanToValueInterestTiers[len(r.LoanToValueInterestTiers)-1].Percentage / 100
+		initialRatio := r.InitialPrincipal / r.MarketValue
+
+		if initialRatio > initialTierPercentage {
+			return false, fmt.Sprintf("No interest tier found for initial percentage of %.2f %%", initialRatio*100)
+		}
+
+	} else {
+
+		sort.Slice(r.InterestTierUpdates[:], func(i, j int) bool {
+			return r.InterestTierUpdates[i].Month < r.InterestTierUpdates[j].Month
+		})
+
+		if r.InterestTierUpdates[0].Month != 1 {
+			return false, "Interest Rate updates does not contain interest for 1st month!"
+		}
+
 	}
 
 	if r.IncomeTax < 0 || r.IncomeTax > 100 {
@@ -88,17 +111,33 @@ func ValidateInputData(r model.MonthlyPaymentRequest) (bool, string) {
 	return true, ""
 }
 
-func getInterestTierPercentage(m float64, p float64, l []model.InterestTier) float64 {
+func getLoanToValueInterest(m float64, p float64, l []model.LoanToValueInterestTier) float64 {
 
 	ratio := p / m * 100
 
 	for _, e := range l {
 		if ratio <= e.Percentage {
-			return e.Interest
+			return e.Interest / 100
 		}
 	}
 
 	return 0.0
+}
+
+func getLatestInterestUpdate(m int, l []model.InterestTierUpdate) float64 {
+
+	interest := 0.0
+
+	for _, e := range l {
+
+		if e.Month > m {
+			return interest / 100
+		}
+
+		interest = e.Interest
+	}
+
+	return interest / 100
 }
 
 func processExtraRepayments(rp []model.Repayment, m int, p *float64) {

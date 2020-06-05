@@ -2,20 +2,28 @@ package model
 
 import "github.com/strongo/decimal"
 
-// MonthlyPaymentRequest : calculate monthly payment request object
-type MonthlyPaymentRequest struct {
-	InitialPrincipal float64
-	MarketValue      float64
-	Months           int
-	IncomeTax        int
-	InterestTiers    []InterestTier
-	Repayments       []Repayment
+// MonthlyPaymentsRequest : calculate monthly payment request object
+type MonthlyPaymentsRequest struct {
+	InitialPrincipal         float64
+	MarketValue              float64
+	Months                   int
+	IncomeTax                int
+	AutomaticInterestUpdate  bool
+	LoanToValueInterestTiers []LoanToValueInterestTier
+	InterestTierUpdates      []InterestTierUpdate
+	Repayments               []Repayment
 }
 
 // InterestTier : Represents a Interest Tier aka ‘loan-to-value ratio’
-type InterestTier struct {
+type LoanToValueInterestTier struct {
 	Percentage float64
 	Interest   float64
+}
+
+// InterestTierUpdate : Represents an interest update for a certain month
+type InterestTierUpdate struct {
+	Month    int
+	Interest float64
 }
 
 // Repayment : a extra repayment during the mortgage period
