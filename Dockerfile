@@ -1,4 +1,4 @@
-FROM golang:1.14-alpine3.12 as builder
+FROM golang:1.15-alpine3.12 as builder
 
 LABEL maintainer="Leandro Loureiro <leandroloureiro@pm.me>"
 

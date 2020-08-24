@@ -5,7 +5,7 @@ At moment only supports to calculate the monthly payments of Linear Mortgage off
 
 ## Pre-requisites
 
-- Go 1.14
+- Go 1.15
 - httpie (optional for testing)
 - Docker (optional)
 
