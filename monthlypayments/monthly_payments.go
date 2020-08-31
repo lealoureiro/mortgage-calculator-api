@@ -13,6 +13,13 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 
 	result := make([]model.MonthPayment, 0, r.Months)
 
+	var interestSet *InterestSet
+	if r.AutomaticInterestUpdate {
+		interestSet = &LoanToValueInterestSet{r.MarketValue, r.LoanToValueInterestTiers}
+	} else {
+		interestSet = &InterestUpdatesSet{r.InterestTierUpdates}
+	}
+
 	monthlyRepayment := r.InitialPrincipal / float64(r.Months)
 	principal := r.InitialPrincipal
 
@@ -31,12 +38,7 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 			monthlyRepayment = principal
 		}
 
-		if r.AutomaticInterestUpdate {
-			interestPercentage = getLoanToValueInterest(r.MarketValue, principal, r.LoanToValueInterestTiers)
-		} else {
-			interestPercentage = getLatestInterestUpdate(i, r.InterestTierUpdates)
-		}
-
+		interestPercentage = interestSet.GetInterest(i, principal)
 		interestGrossAmount = (principal * interestPercentage) / 12.0
 		interestNetAmount = interestGrossAmount - (interestGrossAmount * incomeTax)
 
@@ -109,35 +111,6 @@ func ValidateInputData(r model.MonthlyPaymentsRequest) (bool, string) {
 	}
 
 	return true, ""
-}
-
-func getLoanToValueInterest(m float64, p float64, l []model.LoanToValueInterestTier) float64 {
-
-	ratio := p / m * 100
-
-	for _, e := range l {
-		if ratio <= e.Percentage {
-			return e.Interest / 100
-		}
-	}
-
-	return 0.0
-}
-
-func getLatestInterestUpdate(m int, l []model.InterestTierUpdate) float64 {
-
-	interest := 0.0
-
-	for _, e := range l {
-
-		if e.Month > m {
-			return interest / 100
-		}
-
-		interest = e.Interest
-	}
-
-	return interest / 100
 }
 
 func processExtraRepayments(rp []model.Repayment, m int, p *float64) {
