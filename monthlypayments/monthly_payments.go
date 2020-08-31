@@ -13,11 +13,11 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 
 	result := make([]model.MonthPayment, 0, r.Months)
 
-	var interestSet *InterestSet
+	var interestSet InterestSet
 	if r.AutomaticInterestUpdate {
-		interestSet = &LoanToValueInterestSet{r.MarketValue, r.LoanToValueInterestTiers}
+		interestSet = LoanToValueInterestSet{r.MarketValue, r.LoanToValueInterestTiers}
 	} else {
-		interestSet = &InterestUpdatesSet{r.InterestTierUpdates}
+		interestSet = InterestUpdatesSet{r.InterestTierUpdates}
 	}
 
 	monthlyRepayment := r.InitialPrincipal / float64(r.Months)
