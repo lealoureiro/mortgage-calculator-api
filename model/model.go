@@ -22,8 +22,9 @@ type LoanToValueInterestTier struct {
 
 // InterestTierUpdate : Represents an interest update for a certain month
 type InterestTierUpdate struct {
-	Month    int
-	Interest float64
+	MarketValue float64
+	Month       int
+	Interest    float64
 }
 
 // Repayment : a extra repayment during the mortgage period
@@ -42,6 +43,8 @@ type MonthPayment struct {
 	Principal           decimal.Decimal64p2 `json:"principal"`
 	TotalGross          decimal.Decimal64p2 `json:"totalGross"`
 	TotalNet            decimal.Decimal64p2 `json:"totalNet"`
+	LoanToValueRatio    decimal.Decimal64p2 `json:"loanToValueRation"`
+	MarketValue         decimal.Decimal64p2 `json:"marketValue"`
 }
 
 // MonthlyPayments : the response model of Mortgage monthly payments operation

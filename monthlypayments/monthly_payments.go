@@ -17,7 +17,7 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 	if r.AutomaticInterestUpdate {
 		interestSet = LoanToValueInterestSet{r.MarketValue, r.LoanToValueInterestTiers}
 	} else {
-		interestSet = InterestUpdatesSet{r.InterestTierUpdates}
+		interestSet = InterestUpdatesSet{r.MarketValue, r.InterestTierUpdates}
 	}
 
 	monthlyRepayment := r.InitialPrincipal / float64(r.Months)
@@ -26,9 +26,9 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 	interestPercentage := 0.0
 	interestGrossAmount := 0.0
 	interestNetAmount := 0.0
-
 	totalGrossInterest := 0.0
 	totalNetInterest := 0.0
+	marketValue := 0.0
 
 	incomeTax := float64(r.IncomeTax) / 100.0
 
@@ -38,7 +38,7 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 			monthlyRepayment = principal
 		}
 
-		interestPercentage = interestSet.GetInterest(i, principal)
+		interestPercentage, marketValue = interestSet.GetInterest(i, principal)
 		interestGrossAmount = (principal * interestPercentage) / 12.0
 		interestNetAmount = interestGrossAmount - (interestGrossAmount * incomeTax)
 
@@ -55,6 +55,8 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 		payment.InterestPercentage = decimal.NewDecimal64p2FromFloat64(interestPercentage * 100)
 		payment.TotalGross = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + interestGrossAmount)
 		payment.TotalNet = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + interestNetAmount)
+		payment.LoanToValueRatio = decimal.NewDecimal64p2FromFloat64(principal / marketValue * 100)
+		payment.MarketValue = decimal.NewDecimal64p2FromFloat64(marketValue)
 
 		result = append(result, payment)
 
