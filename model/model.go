@@ -14,7 +14,7 @@ type MonthlyPaymentsRequest struct {
 	Repayments               []Repayment
 }
 
-// InterestTier : Represents a Interest Tier aka ‘loan-to-value ratio’
+// LoanToValueInterestTier : Represents a Interest Tier aka ‘loan-to-value ratio’
 type LoanToValueInterestTier struct {
 	Percentage float64
 	Interest   float64
