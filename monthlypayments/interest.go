@@ -1,6 +1,8 @@
 package monthlypayments
 
-import "github.com/lealoureiro/mortgage-calculator-api/model"
+import (
+	"github.com/lealoureiro/mortgage-calculator-api/model"
+)
 
 // InterestSet : represents a set of interest
 type InterestSet interface {
@@ -47,7 +49,14 @@ func (s InterestUpdatesSet) GetInterest(month int, _ float64) (float64, float64)
 		}
 
 		interest = e.Interest
-		marketValue = e.MarketValue
+
+		if e.MarketValue != nil {
+			marketValue = e.MarketValue.AsFloat64()
+			s.marketValue = e.MarketValue.AsFloat64()
+		} else {
+			marketValue = s.marketValue
+		}
+
 	}
 
 	return interest / 100, marketValue

@@ -22,7 +22,7 @@ type LoanToValueInterestTier struct {
 
 // InterestTierUpdate : Represents an interest update for a certain month
 type InterestTierUpdate struct {
-	MarketValue float64
+	MarketValue *decimal.Decimal64p2 `json:"marketValue"`
 	Month       int
 	Interest    float64
 }

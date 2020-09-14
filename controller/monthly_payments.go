@@ -37,11 +37,17 @@ func MonthlyPayments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Calculating monthly payments for %.2f for property with market value %.2f to be paid in %d months with Interest Tiers %v and Extra Repayments %v", rb.InitialPrincipal, rb.MarketValue, rb.Months, rb.LoanToValueInterestTiers, rb.Repayments)
+	log.Printf("Calculating monthly payments for %.2f for property with initial market value %.2f to be paid in %d months with automatic updates %v and Extra Repayments %v", rb.InitialPrincipal, rb.MarketValue, rb.Months, rb.AutomaticInterestUpdate, rb.Repayments)
 
 	mps := monthlypayments.CalculateLinearMonthlyPayments(rb)
 
-	mpsJSON, _ := json.Marshal(mps)
+	mpsJSON, err3 := json.Marshal(mps)
+
+	if err3 != nil {
+		log.Printf("Error serializing the response when calculating monthly payments, reason: %s", err3)
+		utils.RespondHTTPError(500, err3.Error(), w)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 
