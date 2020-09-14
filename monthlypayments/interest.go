@@ -17,8 +17,9 @@ type LoanToValueInterestSet struct {
 
 // InterestUpdatesSet : list of interest rates based on updates (changed manually LoanToRation or possible market value change)
 type InterestUpdatesSet struct {
-	marketValue   float64
-	interestTiers []model.InterestTierUpdate
+	marketValue     float64
+	currentInterest float64
+	interestTiers   []model.InterestTierUpdate
 }
 
 // GetInterest : get current interest rate based on Loan to Value ratio
@@ -48,7 +49,12 @@ func (s InterestUpdatesSet) GetInterest(month int, _ float64) (float64, float64)
 			return interest / 100, marketValue
 		}
 
-		interest = e.Interest
+		if e.Interest != nil {
+			interest = e.Interest.AsFloat64()
+			s.currentInterest = e.Interest.AsFloat64()
+		} else {
+			interest = s.currentInterest
+		}
 
 		if e.MarketValue != nil {
 			marketValue = e.MarketValue.AsFloat64()

@@ -5,7 +5,8 @@ import "github.com/strongo/decimal"
 // MonthlyPaymentsRequest : calculate monthly payment request object
 type MonthlyPaymentsRequest struct {
 	InitialPrincipal         float64
-	MarketValue              float64
+	MarketValue              *decimal.Decimal64p2 `json:"marketValue"`
+	InitialInterestRate      *decimal.Decimal64p2 `json:"initialInterestRate"`
 	Months                   int
 	IncomeTax                int
 	AutomaticInterestUpdate  bool
@@ -22,9 +23,9 @@ type LoanToValueInterestTier struct {
 
 // InterestTierUpdate : Represents an interest update for a certain month
 type InterestTierUpdate struct {
-	MarketValue *decimal.Decimal64p2 `json:"marketValue"`
 	Month       int
-	Interest    float64
+	MarketValue *decimal.Decimal64p2 `json:"marketValue"`
+	Interest    *decimal.Decimal64p2 `json:"interest"`
 }
 
 // Repayment : a extra repayment during the mortgage period

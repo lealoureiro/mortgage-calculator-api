@@ -15,9 +15,13 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 
 	var interestSet InterestSet
 	if r.AutomaticInterestUpdate {
-		interestSet = LoanToValueInterestSet{r.MarketValue, r.LoanToValueInterestTiers}
+		interestSet = LoanToValueInterestSet{r.MarketValue.AsFloat64(), r.LoanToValueInterestTiers}
 	} else {
-		interestSet = InterestUpdatesSet{r.MarketValue, r.InterestTierUpdates}
+		interestSet = InterestUpdatesSet{
+			r.MarketValue.AsFloat64(),
+			r.InitialInterestRate.AsFloat64(),
+			r.InterestTierUpdates,
+		}
 	}
 
 	monthlyRepayment := r.InitialPrincipal / float64(r.Months)
@@ -83,6 +87,10 @@ func ValidateInputData(r model.MonthlyPaymentsRequest) (bool, string) {
 		return false, "No interest tiers month updates provided!"
 	}
 
+	if r.MarketValue == nil {
+		return false, "Missing initial Market Value!"
+	}
+
 	if r.AutomaticInterestUpdate {
 
 		sort.Slice(r.LoanToValueInterestTiers[:], func(i, j int) bool {
@@ -90,7 +98,7 @@ func ValidateInputData(r model.MonthlyPaymentsRequest) (bool, string) {
 		})
 
 		initialTierPercentage := r.LoanToValueInterestTiers[len(r.LoanToValueInterestTiers)-1].Percentage / 100
-		initialRatio := r.InitialPrincipal / r.MarketValue
+		initialRatio := r.InitialPrincipal / r.MarketValue.AsFloat64()
 
 		if initialRatio > initialTierPercentage {
 			return false, fmt.Sprintf("No interest tier found for initial percentage of %.2f %%", initialRatio*100)
@@ -98,12 +106,20 @@ func ValidateInputData(r model.MonthlyPaymentsRequest) (bool, string) {
 
 	} else {
 
-		sort.Slice(r.InterestTierUpdates[:], func(i, j int) bool {
-			return r.InterestTierUpdates[i].Month < r.InterestTierUpdates[j].Month
-		})
+		if r.InitialInterestRate == nil {
+			return false, "Missing initial interest rate!"
+		}
 
-		if r.InterestTierUpdates[0].Month != 1 {
-			return false, "Interest Rate updates does not contain interest for 1st month!"
+		for _, u := range r.InterestTierUpdates {
+
+			if u.Month < 1 || u.Month > r.Months {
+				return false, fmt.Sprintf("Interest update month %d outside of range!", u.Month)
+			}
+
+			if u.Interest == nil && u.MarketValue == nil {
+				return false, fmt.Sprintf("Manually update for month %d should contain at least Market Value or Interest Rate!", u.Month)
+			}
+
 		}
 
 	}
