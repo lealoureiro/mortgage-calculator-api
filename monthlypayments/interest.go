@@ -46,7 +46,7 @@ func (s InterestUpdatesSet) GetInterest(month int, _ float64) (float64, float64)
 	for _, e := range s.interestTiers {
 
 		if e.Month > month {
-			return interest / 100, marketValue
+			return s.currentInterest / 100, s.marketValue
 		}
 
 		if e.Interest != nil {
