@@ -2,8 +2,11 @@ package monthlypayments
 
 import (
 	"fmt"
+	"log"
 	"sort"
+	"time"
 
+	"github.com/jinzhu/now"
 	"github.com/lealoureiro/mortgage-calculator-api/model"
 	"github.com/strongo/decimal"
 )
@@ -36,7 +39,14 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 
 	incomeTax := float64(r.IncomeTax) / 100.0
 
-	for i := 1; i <= r.Months && principal > 0; i++ {
+	currentTime := r.StartDate.AsTime()
+	endOfMonth := now.With(currentTime).EndOfMonth()
+
+	log.Printf("Diference %d", daysBetweenDates(currentTime, endOfMonth))
+
+	for i := 1; principal > 0; i++ {
+
+		currentTime = currentTime.AddDate(0, 1, 0)
 
 		if principal < monthlyRepayment {
 			monthlyRepayment = principal
@@ -52,6 +62,7 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 		var payment = model.MonthPayment{}
 
 		payment.Month = i
+		payment.PaymentDate = model.NewJSONTime(currentTime)
 		payment.Repayment = decimal.NewDecimal64p2FromFloat64(monthlyRepayment)
 		payment.InterestGrossAmount = decimal.NewDecimal64p2FromFloat64(interestGrossAmount)
 		payment.InterestNetAmount = decimal.NewDecimal64p2FromFloat64(interestNetAmount)
@@ -89,6 +100,10 @@ func ValidateInputData(r model.MonthlyPaymentsRequest) (bool, string) {
 
 	if r.MarketValue == nil {
 		return false, "Missing initial Market Value!"
+	}
+
+	if r.StartDate == nil {
+		return false, "Missing start date!"
 	}
 
 	if r.AutomaticInterestUpdate {
@@ -143,4 +158,9 @@ func processExtraRepayments(rp []model.Repayment, m int, p *float64) {
 		}
 	}
 
+}
+
+func daysBetweenDates(t1, t2 time.Time) int32 {
+	duration := t2.Sub(t1).Hours() / 24
+	return int32(duration)
 }
