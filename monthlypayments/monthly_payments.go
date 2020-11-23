@@ -2,6 +2,7 @@ package monthlypayments
 
 import (
 	"fmt"
+	"math"
 	"sort"
 	"time"
 
@@ -34,7 +35,6 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 	interestNetAmount := 0.0
 	totalGrossInterest := 0.0
 	totalNetInterest := 0.0
-	marketValue := 0.0
 
 	incomeTax := float64(r.IncomeTax) / 100.0
 
@@ -43,14 +43,41 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 
 	remainingDaysInitialMonth := daysBetweenDates(currentTime, endOfMonth)
 
-	initialInterest, _ := interestSet.GetInterest(1, principal)
-	initialInterestGross := ((principal * initialInterest) / float64(360)) * float64(remainingDaysInitialMonth+3)
-	initialInterestNet := initialInterestGross - (initialInterestGross * incomeTax)
+	initialInterest, marketValue := interestSet.GetInterest(1, principal)
+	initialInterestGross := ((principal * initialInterest) / float64(360)) * float64(remainingDaysInitialMonth+1)
 
-	totalGrossInterest += initialInterestGross
-	totalNetInterest += initialInterestNet
+	firstDayNextMonth := endOfMonth.Add(time.Nanosecond * time.Duration(1))
+	endOfMonth = now.With(firstDayNextMonth).EndOfMonth()
 
-	for i := 1; principal > 0; i++ {
+	daysFirstRepaymentMonth := daysBetweenDates(firstDayNextMonth, endOfMonth)
+	firstMonthInterestGross := ((principal*initialInterest)/float64(360))*float64(daysFirstRepaymentMonth) + initialInterestGross
+	firstMonthInterestNet := firstMonthInterestGross - (firstMonthInterestGross * incomeTax)
+
+	totalGrossInterest += firstMonthInterestGross
+	totalNetInterest += firstMonthInterestNet
+
+	paymentDate := firstDayNextMonth.AddDate(0, 1, 0)
+
+	var payment = model.MonthPayment{}
+
+	payment.Month = 1
+	payment.PaymentDate = model.NewJSONTime(paymentDate)
+	payment.Repayment = decimal.NewDecimal64p2FromFloat64(monthlyRepayment)
+	payment.InterestGrossAmount = decimal.NewDecimal64p2FromFloat64(firstMonthInterestGross)
+	payment.InterestNetAmount = decimal.NewDecimal64p2FromFloat64(firstMonthInterestNet)
+	payment.Principal = decimal.NewDecimal64p2FromFloat64(principal)
+	payment.InterestPercentage = decimal.NewDecimal64p2FromFloat64(initialInterest * 100)
+	payment.TotalGross = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + firstMonthInterestGross)
+	payment.TotalNet = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + firstMonthInterestNet)
+	payment.LoanToValueRatio = decimal.NewDecimal64p2FromFloat64(principal / marketValue * 100)
+	payment.MarketValue = decimal.NewDecimal64p2FromFloat64(marketValue)
+
+	result = append(result, payment)
+
+	principal -= monthlyRepayment
+	currentTime = paymentDate
+
+	for i := 2; principal > 0; i++ {
 
 		currentTime = currentTime.AddDate(0, 1, 0)
 
@@ -168,5 +195,5 @@ func processExtraRepayments(rp []model.Repayment, m int, p *float64) {
 
 func daysBetweenDates(t1, t2 time.Time) int32 {
 	duration := t2.Sub(t1).Hours() / 24
-	return int32(duration)
+	return int32(math.Round(duration))
 }

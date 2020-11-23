@@ -84,7 +84,7 @@ type MonthPayment struct {
 	Principal           decimal.Decimal64p2 `json:"principal"`
 	TotalGross          decimal.Decimal64p2 `json:"totalGross"`
 	TotalNet            decimal.Decimal64p2 `json:"totalNet"`
-	LoanToValueRatio    decimal.Decimal64p2 `json:"loanToValueRation"`
+	LoanToValueRatio    decimal.Decimal64p2 `json:"loanToValueRatio"`
 	MarketValue         decimal.Decimal64p2 `json:"marketValue"`
 }
 
