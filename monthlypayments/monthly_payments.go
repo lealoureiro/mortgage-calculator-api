@@ -2,7 +2,6 @@ package monthlypayments
 
 import (
 	"fmt"
-	"log"
 	"sort"
 	"time"
 
@@ -42,7 +41,14 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 	currentTime := r.StartDate.AsTime()
 	endOfMonth := now.With(currentTime).EndOfMonth()
 
-	log.Printf("Diference %d", daysBetweenDates(currentTime, endOfMonth))
+	remainingDaysInitialMonth := daysBetweenDates(currentTime, endOfMonth)
+
+	initialInterest, _ := interestSet.GetInterest(1, principal)
+	initialInterestGross := ((principal * initialInterest) / float64(360)) * float64(remainingDaysInitialMonth+3)
+	initialInterestNet := initialInterestGross - (initialInterestGross * incomeTax)
+
+	totalGrossInterest += initialInterestGross
+	totalNetInterest += initialInterestNet
 
 	for i := 1; principal > 0; i++ {
 
