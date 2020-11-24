@@ -79,18 +79,18 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 
 	for i := 2; principal > 0; i++ {
 
-		currentTime = currentTime.AddDate(0, 1, 0)
-
 		if principal < monthlyRepayment {
 			monthlyRepayment = principal
 		}
 
 		interestPercentage, marketValue = interestSet.GetInterest(i, principal)
-		interestGrossAmount = (principal * interestPercentage) / 12.0
+		interestGrossAmount = ((principal * interestPercentage) / 12.0)
 		interestNetAmount = interestGrossAmount - (interestGrossAmount * incomeTax)
 
 		totalGrossInterest += interestGrossAmount
 		totalNetInterest += interestNetAmount
+
+		currentTime = currentTime.AddDate(0, 1, 0)
 
 		var payment = model.MonthPayment{}
 
