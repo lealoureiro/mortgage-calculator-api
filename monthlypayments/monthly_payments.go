@@ -2,6 +2,7 @@ package monthlypayments
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"sort"
 	"time"
@@ -77,14 +78,20 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 	principal -= monthlyRepayment
 	currentTime = paymentDate
 
+	repayments := r.Repayments
+
+	monthAveragePrincipal := 0.0
+
 	for i := 2; principal > 0; i++ {
+
+		repayments, monthAveragePrincipal = processExtraRepayments(repayments, &principal, currentTime, now.With(currentTime).EndOfMonth())
 
 		if principal < monthlyRepayment {
 			monthlyRepayment = principal
 		}
 
 		interestPercentage, marketValue = interestSet.GetInterest(i, principal)
-		interestGrossAmount = ((principal * interestPercentage) / 12.0)
+		interestGrossAmount = monthAveragePrincipal * (interestPercentage / 12.0)
 		interestNetAmount = interestGrossAmount - (interestGrossAmount * incomeTax)
 
 		totalGrossInterest += interestGrossAmount
@@ -110,14 +117,61 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 
 		principal -= monthlyRepayment
 
-		processExtraRepayments(r.Repayments, i, &principal)
-
 	}
 
 	return model.MonthlyPayments{
 		Payments:           result,
 		TotalGrossInterest: decimal.NewDecimal64p2FromFloat64(totalGrossInterest),
 		TotalNetInterest:   decimal.NewDecimal64p2FromFloat64(totalNetInterest)}
+}
+
+func processExtraRepayments(rp []model.Repayment, p *float64, s, e time.Time) ([]model.Repayment, float64) {
+
+	log.Printf("From %s to %s", s.String(), e.String())
+
+	if len(rp) == 0 {
+		return rp, *p
+	}
+
+	days := 0
+	totalPrincipal := 0.0
+
+	for d := s; d.Before(e); d = d.AddDate(0, 0, 1) {
+
+		rp = findRepaymentsForDate(rp, d, p)
+
+		days++
+		totalPrincipal += *p
+
+	}
+
+	monthAveragePrincipal := totalPrincipal / float64(days)
+
+	log.Printf("Days %d, Average Principal %.2f", days, monthAveragePrincipal)
+
+	return rp, monthAveragePrincipal
+
+}
+
+func findRepaymentsForDate(rp []model.Repayment, d time.Time, p *float64) []model.Repayment {
+
+	if len(rp) == 0 {
+		return rp
+	}
+
+	remaining := make([]model.Repayment, 0, len(rp))
+
+	for _, v := range rp {
+
+		if d.Equal(v.Date.AsTime()) {
+			*p -= v.Amount
+		} else {
+			remaining = append(remaining, v)
+		}
+
+	}
+
+	return remaining
 }
 
 // ValidateInputData : validate the input data request to calculate Mortgage Monthly payments
@@ -177,20 +231,6 @@ func ValidateInputData(r model.MonthlyPaymentsRequest) (bool, string) {
 	}
 
 	return true, ""
-}
-
-func processExtraRepayments(rp []model.Repayment, m int, p *float64) {
-
-	if rp == nil || len(rp) == 0 {
-		return
-	}
-
-	for _, e := range rp {
-		if e.Month == m {
-			*p -= e.Amount
-		}
-	}
-
 }
 
 func daysBetweenDates(t1, t2 time.Time) int32 {

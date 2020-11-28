@@ -69,7 +69,7 @@ type InterestTierUpdate struct {
 
 // Repayment : a extra repayment during the mortgage period
 type Repayment struct {
-	Month  int
+	Date   JSONTime
 	Amount float64
 }
 
