@@ -11,8 +11,8 @@ COPY utils utils
 COPY mortgage-calculator-api.go .
 COPY go.mod .
 
+RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/mortgage-calculator-api .
-
 
 FROM alpine:latest
 
