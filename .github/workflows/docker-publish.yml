@@ -78,7 +78,13 @@ jobs:
 
       - name: Push image to Heroku registry
         run: | 
-          docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME registry.heroku.com/secret-journey-21988/web
+
+          # Get correct version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:$VERSION registry.heroku.com/secret-journey-21988/web
           docker push registry.heroku.com/secret-journey-21988/web
 
       - name: Deploy image in Heorku App
