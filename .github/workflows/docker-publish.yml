@@ -61,7 +61,14 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
       - name: Download image from GitHub Packages
-        run: docker pull docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+        run: |
+
+          # Get correct version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          docker pull docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:$VERSION
 
       - name: Logout from GitHub registry
         run: docker logout docker.pkg.github.com
@@ -69,11 +76,10 @@ jobs:
       - name: Login into Heroku registry
         run: echo "${{ secrets.HEROKU_TOKEN }}" | docker login registry.heroku.com -u ${{ secrets.HEROKU_MAIL }} --password-stdin
 
-      - name: Re-tag image for Heroku registry
-        run: docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME registry.heroku.com/secret-journey-21988/web
-
       - name: Push image to Heroku registry
-        run: docker push registry.heroku.com/secret-journey-21988/web
+        run: | 
+          docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME registry.heroku.com/secret-journey-21988/web
+          docker push registry.heroku.com/secret-journey-21988/web
 
       - name: Deploy image in Heorku App
         run: heroku container:release web -a secret-journey-21988
