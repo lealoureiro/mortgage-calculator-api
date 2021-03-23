@@ -69,6 +69,9 @@ jobs:
       - name: Logout from GitHub registry
         run: docker logout docker.pkg.github.com
 
-      - name: Login into Heroku repository
+      - name: Login into Heroku registry
         run: echo "${{ secrets.HEROKU_TOKEN }}" | docker login registry.heroku.com -u ${{ secrets.HEROKU_MAIL }} --password-stdin
+
+      - name: Push image to Heroku registry
+        run: docker push registry.heroku.com/$IMAGE_NAME
 
