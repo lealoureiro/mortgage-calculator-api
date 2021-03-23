@@ -84,6 +84,6 @@ jobs:
       - name: Deploy image in Heorku App
         run: |
           HEROKU_API_KEY=${{ secrets.HEROKU_TOKEN }}
-          heroku auth:token
+          heroku login
 
 
