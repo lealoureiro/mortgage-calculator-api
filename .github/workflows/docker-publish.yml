@@ -66,6 +66,9 @@ jobs:
       - name: Download image from GitHub Packages
         run: docker pull docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
 
+      - name: Logout from GitHub registry
+        run: docker logout docker.pkg.github.com
+
       - name: Login into Heroku repository
         run: echo "${{ secrets.HEROKU_TOKEN }}" | docker login registry.heroku.com -u ${{ secrets.HEROKU_MAIL }} --password-stdin
 
