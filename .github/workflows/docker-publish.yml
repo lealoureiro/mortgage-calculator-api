@@ -17,7 +17,7 @@ jobs:
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   push:
-    name: Push Docker image to GitHub Packages
+    name: Push image to packages
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
@@ -52,4 +52,5 @@ jobs:
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
-deploy:
+  deploy:
+    name: Push image to Heroku
