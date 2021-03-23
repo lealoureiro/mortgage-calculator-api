@@ -72,6 +72,9 @@ jobs:
       - name: Login into Heroku registry
         run: echo "${{ secrets.HEROKU_TOKEN }}" | docker login registry.heroku.com -u ${{ secrets.HEROKU_MAIL }} --password-stdin
 
+      - name: List local Docker images
+        run: docker image ls 
+
       - name: Push image to Heroku registry
         run: docker push registry.heroku.com/$IMAGE_NAME
 
