@@ -12,10 +12,11 @@ on:
 env:
   IMAGE_NAME: mortgage-calculator-api
 
+jobs:
+
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   push:
-
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
