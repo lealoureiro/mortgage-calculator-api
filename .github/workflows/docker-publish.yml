@@ -2,11 +2,10 @@ name: Docker
 
 on:
   push:
-    # Publish `master` as Docker `latest` image.
+
     branches:
       - master
 
-    # Publish `v1.2.3` tags as releases.
     tags:
       - v*
 env:
@@ -14,8 +13,6 @@ env:
 
 jobs:
 
-  # Push image to GitHub Packages.
-  # See also https://docs.docker.com/docker-hub/builds/
   push:
     name: Push image to packages
     runs-on: ubuntu-latest
@@ -72,9 +69,6 @@ jobs:
       - name: Login into Heroku registry
         run: echo "${{ secrets.HEROKU_TOKEN }}" | docker login registry.heroku.com -u ${{ secrets.HEROKU_MAIL }} --password-stdin
 
-      - name: List local Docker images
-        run: docker image ls 
-
       - name: Re-tag image for Heroku registry
         run: docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME registry.heroku.com/secret-journey-21988/web
 
@@ -82,7 +76,7 @@ jobs:
         run: docker push registry.heroku.com/secret-journey-21988/web
 
       - name: Deploy image in Heorku App
-        run: heroku container:release -a web
+        run: heroku container:release web -a secret-journey-21988
         env: 
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
     
