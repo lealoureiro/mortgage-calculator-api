@@ -1,11 +1,7 @@
-name: Docker
+name: Build and deploy Release
 
 on:
   push:
-
-    branches:
-      - master
-
     tags:
       - v*
 env:
@@ -29,19 +25,13 @@ jobs:
 
       - name: Push image
         run: |
+
+          # setting image id
           IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
 
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-
-          # Strip git ref prefix from version
+          # getting the correct version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=latest
+          VERSION=$(echo $VERSION | sed -e 's/^v//')
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
@@ -63,10 +53,9 @@ jobs:
       - name: Download image from GitHub Packages
         run: |
 
-          # Get correct version
+          # getting the correct version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          [ "$VERSION" == "master" ] && VERSION=latest
+          VERSION=$(echo $VERSION | sed -e 's/^v//')
 
           docker pull docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:$VERSION
 
@@ -81,8 +70,7 @@ jobs:
 
           # Get correct version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          [ "$VERSION" == "master" ] && VERSION=latest
+          VERSION=$(echo $VERSION | sed -e 's/^v//')
 
           docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:$VERSION registry.heroku.com/secret-journey-21988/web
           docker push registry.heroku.com/secret-journey-21988/web
