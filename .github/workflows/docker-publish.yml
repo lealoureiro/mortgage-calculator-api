@@ -60,6 +60,9 @@ jobs:
 
     steps:
 
+      - name: Download image from GitHub Packages
+        run: docker pull docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+
       - name: Login into Heroku repository
         run: echo "${{ secrets.HEROKU_TOKEN }}" | docker login registry.heroku.com -u ${{ secrets.HEROKU_MAIL }} --password-stdin
 
