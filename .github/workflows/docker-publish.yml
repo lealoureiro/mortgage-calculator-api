@@ -56,9 +56,9 @@ jobs:
     
     name: Push image to Heroku
     runs-on: ubuntu-latest
-    
+
     steps:
 
       - name: Login into Heroku repository
-        run: echo "${{ secrets.HEROKU_TOKEN }}" | docker login registry.heroku.com -u ${{ github.HEROKU_MAIL }} --password-stdin
+        run: echo "${{ secrets.HEROKU_TOKEN }}" | docker login registry.heroku.com -u ${{ secrets.HEROKU_MAIL }} --password-stdin
 
