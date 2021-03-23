@@ -81,3 +81,9 @@ jobs:
       - name: Push image to Heroku registry
         run: docker push registry.heroku.com/secret-journey-21988
 
+      - name: Deploy image in Heorku App
+        run: |
+          HEROKU_API_KEY=${{ secrets.HEROKU_TOKEN }}
+          heroku auth:token
+
+
