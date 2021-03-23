@@ -27,7 +27,7 @@ jobs:
       - name: Build image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME
 
-      - name: Log into registry
+      - name: Log into GitHub registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
       - name: Push image
@@ -59,6 +59,9 @@ jobs:
     needs: push 
 
     steps:
+
+      - name: Log into GitHub registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
       - name: Download image from GitHub Packages
         run: docker pull docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
