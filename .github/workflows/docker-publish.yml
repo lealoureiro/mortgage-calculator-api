@@ -55,7 +55,8 @@ jobs:
   deploy:
     
     name: Push image to Heroku
-
+    runs-on: ubuntu-latest
+    
     steps:
 
       - name: Login into Heroku repository
