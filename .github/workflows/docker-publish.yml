@@ -75,6 +75,9 @@ jobs:
       - name: List local Docker images
         run: docker image ls 
 
+      - name: Re-tag image for Heroku registry
+        run: docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME registry.heroku.com/$IMAGE_NAME
+
       - name: Push image to Heroku registry
         run: docker push registry.heroku.com/$IMAGE_NAME
 
