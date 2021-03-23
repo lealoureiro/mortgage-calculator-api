@@ -76,15 +76,15 @@ jobs:
         run: docker image ls 
 
       - name: Re-tag image for Heroku registry
-        run: docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME registry.heroku.com/secret-journey-21988
+        run: docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME registry.heroku.com/secret-journey-21988/web
 
       - name: Push image to Heroku registry
-        run: docker push registry.heroku.com/secret-journey-21988
+        run: docker push registry.heroku.com/secret-journey-21988/web
 
       - name: Deploy image in Heorku App
-        run: heroku login
+        run: heroku container:release -a web
         env: 
-          HEROKU_API_KEY: ${{ secrets.HEROKU_TOKEN }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
     
 
 
