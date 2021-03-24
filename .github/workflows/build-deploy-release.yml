@@ -22,9 +22,10 @@ jobs:
         run: | 
 
           #  setting application version
-          BUILD_COMMIT=$()
+          BUILD_COMMIT=$(git rev-parse --short HEAD)
+          BUILD_VERSION=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
 
-          docker build . --file Dockerfile --tag $IMAGE_NAME
+          docker build . --file Dockerfile --build-arg APP_VERSION=$BUILD_COMMIT-$BUILD_VERSION --tag $IMAGE_NAME
 
       - name: Log into GitHub registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
