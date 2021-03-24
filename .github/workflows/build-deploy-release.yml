@@ -22,6 +22,7 @@ jobs:
         run: | 
 
           #  setting application version
+          BUILD_COMMIT=$()
 
           docker build . --file Dockerfile --tag $IMAGE_NAME
 
