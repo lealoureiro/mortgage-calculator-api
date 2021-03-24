@@ -57,12 +57,12 @@ jobs:
         run: docker logout docker.pkg.github.com
 
       - name: Login into Docker Hub
-        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login docker.pkg.github.com -u lealoureiro --password-stdin
+        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u lealoureiro --password-stdin
       
       - name: Push image to Docker Hub
         run: | 
           docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:latest lealoureiro/$IMAGE_NAME:latest
-          docker push lealoureiro/$IMAGE_NAME:latest
+          docker push lealoureiro/${IMAGE_NAME}:latest
       
       - name: Logout from Docker Hub
         run: registry.hub.docker.com
