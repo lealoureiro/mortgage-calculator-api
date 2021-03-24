@@ -31,13 +31,8 @@ jobs:
 
       - name: Push image
         run: |
-
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-
-          echo IMAGE_ID=$IMAGE_ID
-
-          docker tag $IMAGE_NAME $IMAGE_ID:latest
-          docker push $IMAGE_ID:latest
+          docker tag $IMAGE_NAME $docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:latest
+          docker push $docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:latest
   
   push-docker-hub:
 
