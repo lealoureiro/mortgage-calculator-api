@@ -46,6 +46,45 @@ jobs:
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
+  push-docker-hub:
+
+    name: Push image to Docker Hub
+    runs-on: ubuntu-latest
+    needs: push
+
+    steps:
+
+      - name: Log into GitHub registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+
+      - name: Download image from GitHub Packages
+        run: |
+
+          # getting the correct version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          docker pull docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:$VERSION
+
+      - name: Logout from GitHub registry
+        run: docker logout docker.pkg.github.com
+
+      - name: Login into Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u lealoureiro --password-stdin
+      
+      - name: Push image to Docker Hub
+        run: | 
+
+          # getting the correct version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:$VERSION lealoureiro/$IMAGE_NAME:$VERSION
+          docker push lealoureiro/${IMAGE_NAME}:$VERSION
+      
+      - name: Logout from Docker Hub
+        run: docker logout
+
   deploy:
     
     name: Deploy release to Heroku
