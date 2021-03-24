@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/lealoureiro/mortgage-calculator-api/config"
 	"github.com/lealoureiro/mortgage-calculator-api/controller"
 	log "github.com/sirupsen/logrus"
 )
@@ -26,7 +27,8 @@ func main() {
 		FullTimestamp: true,
 	})
 
-	log.Printf("Starting application on port: %s", port)
+	log.Info("Starting Mortgage Calculator API ", config.Version)
+	log.Printf("Receiving requests on port: %s", port)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/info", controller.ShowInfo).Methods("GET")

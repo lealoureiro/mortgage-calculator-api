@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/lealoureiro/mortgage-calculator-api/config"
 	"github.com/lealoureiro/mortgage-calculator-api/utils"
 	log "github.com/sirupsen/logrus"
 )
@@ -18,7 +19,7 @@ func ShowInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m := map[string]string{"applicationName": "Mortgage Calculator", "applicationVersion": "0.0.1"}
+	m := map[string]string{"applicationName": "Mortgage Calculator", "applicationVersion": config.Version}
 	j, _ := json.Marshal(m)
 
 	w.Header().Set("Content-Type", "application/json")
