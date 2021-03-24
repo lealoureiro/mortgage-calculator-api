@@ -33,7 +33,7 @@ jobs:
         run: |
 
           IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-           VERSION=latest
+          VERSION=latest
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
