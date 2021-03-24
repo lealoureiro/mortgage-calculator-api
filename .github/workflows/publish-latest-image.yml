@@ -61,8 +61,8 @@ jobs:
       
       - name: Push image to Docker Hub
         run: | 
-          docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:latest registry.hub.docker.com/lealoureiro/$IMAGE_NAME:latest
-          docker push registry.hub.docker.com/lealoureiro/$IMAGE_NAME:latest
+          docker tag docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:latest lealoureiro/$IMAGE_NAME:latest
+          docker push lealoureiro/$IMAGE_NAME:latest
       
       - name: Logout from Docker Hub
         run: registry.hub.docker.com
