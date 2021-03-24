@@ -65,4 +65,4 @@ jobs:
           docker push lealoureiro/${IMAGE_NAME}:latest
       
       - name: Logout from Docker Hub
-        run: registry.hub.docker.com
+        run: docker logout
