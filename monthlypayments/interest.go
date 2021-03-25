@@ -1,12 +1,14 @@
 package monthlypayments
 
 import (
+	"time"
+
 	"github.com/lealoureiro/mortgage-calculator-api/model"
 )
 
 // InterestSet : represents a set of interest
 type InterestSet interface {
-	GetInterest(month int, principal float64) (float64, float64)
+	GetInterest(date time.Time, principal float64) (float64, float64)
 }
 
 // LoanToValueInterestSet : list of interest rates based on Loan to Value Ratio
@@ -23,7 +25,7 @@ type InterestUpdatesSet struct {
 }
 
 // GetInterest : get current interest rate based on Loan to Value ratio
-func (s LoanToValueInterestSet) GetInterest(_ int, principal float64) (float64, float64) {
+func (s LoanToValueInterestSet) GetInterest(_ time.Time, principal float64) (float64, float64) {
 
 	ratio := principal / s.marketValue * 100
 
@@ -38,14 +40,14 @@ func (s LoanToValueInterestSet) GetInterest(_ int, principal float64) (float64, 
 }
 
 // GetInterest : get current interest based on manually interest rate updates
-func (s InterestUpdatesSet) GetInterest(month int, _ float64) (float64, float64) {
+func (s InterestUpdatesSet) GetInterest(month time.Time, _ float64) (float64, float64) {
 
 	interest := 0.0
 	marketValue := 0.0
 
 	for _, e := range s.interestTiers {
 
-		if e.Month > month {
+		if e.UpdateDate.AsTime().AddDate(0, -1, 0).After(month) {
 			return s.currentInterest / 100, s.marketValue
 		}
 

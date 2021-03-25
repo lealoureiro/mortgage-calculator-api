@@ -44,7 +44,7 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 
 	remainingDaysInitialMonth := daysBetweenDates(currentTime, endOfMonth)
 
-	initialInterest, marketValue := interestSet.GetInterest(1, principal)
+	initialInterest, marketValue := interestSet.GetInterest(currentTime, principal)
 	initialInterestGross := ((principal * initialInterest) / float64(360)) * float64(remainingDaysInitialMonth+1)
 
 	firstDayNextMonth := endOfMonth.Add(time.Nanosecond * time.Duration(1))
@@ -90,7 +90,7 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 			monthlyRepayment = principal
 		}
 
-		interestPercentage, marketValue = interestSet.GetInterest(i, principal)
+		interestPercentage, marketValue = interestSet.GetInterest(currentTime, principal)
 		interestGrossAmount = monthAveragePrincipal * (interestPercentage / 12.0)
 		interestNetAmount = interestGrossAmount - (interestGrossAmount * incomeTax)
 
@@ -214,12 +214,12 @@ func ValidateInputData(r model.MonthlyPaymentsRequest) (bool, string) {
 
 		for _, u := range r.InterestTierUpdates {
 
-			if u.Month < 1 || u.Month > r.Months {
-				return false, fmt.Sprintf("Interest update month %d outside of range!", u.Month)
+			if u.UpdateDate.AsTime().Before(r.StartDate.AsTime()) {
+				return false, fmt.Sprintf("Interest update date %d before mortgage start date!", u.UpdateDate)
 			}
 
 			if u.Interest == nil && u.MarketValue == nil {
-				return false, fmt.Sprintf("Manually update for month %d should contain at least Market Value or Interest Rate!", u.Month)
+				return false, fmt.Sprintf("Manually update for month %d should contain at least Market Value or Interest Rate!", u.UpdateDate)
 			}
 
 		}
