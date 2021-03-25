@@ -1,3 +1,20 @@
+//
+//	Mortgate Calculator API
+//
+//     Schemes: https
+//     BasePath: /
+//     Version: 1.0.0
+//     License: MIT http://opensource.org/licenses/MIT
+//     Contact: Leandro Loureiro <leandroloureiro@pm.me>
+//     Host: secret-journey-21988.herokuapp.com
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+// swagger:meta
 package main
 
 import (
@@ -10,7 +27,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Router to add CORS headers
+// CORSEnabledRouter : Router to add CORS headers
 type CORSEnabledRouter struct {
 	r *mux.Router
 }

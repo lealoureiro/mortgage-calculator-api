@@ -1,0 +1,349 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Mortgate Calculator API",
+    "contact": {
+      "name": "Leandro Loureiro",
+      "email": "leandroloureiro@pm.me"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    },
+    "version": "1.0.0"
+  },
+  "host": "secret-journey-21988.herokuapp.com",
+  "basePath": "/",
+  "paths": {
+    "/info": {
+      "get": {
+        "description": "description: Get application name and version information",
+        "tags": [
+          "API"
+        ],
+        "operationId": "info",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/infoResponse"
+          }
+        }
+      }
+    },
+    "/monthly-payments": {
+      "post": {
+        "description": "description: Calculate Linear Mortgage Monthly Payments",
+        "tags": [
+          "API"
+        ],
+        "operationId": "monthlyPaymentsResquest",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/MonthlyPaymentsRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/monthlyPaymentsResponse"
+          },
+          "400": {
+            "$ref": "#/responses/badRequestResponse"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "BadRequest": {
+      "description": "BadRequest : the response model to hold response for a bad request",
+      "type": "object",
+      "properties": {
+        "errorMessage": {
+          "type": "string",
+          "x-go-name": "ErrorMessage"
+        }
+      },
+      "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
+    },
+    "Decimal64p2": {
+      "description": "Decimal64p2 is a decimal number implementation based on int64 with 2 digits after point fixed precision",
+      "type": "integer",
+      "format": "int64",
+      "x-go-package": "github.com/strongo/decimal"
+    },
+    "Info": {
+      "description": "Info : the response model to show application info",
+      "type": "object",
+      "properties": {
+        "applicationName": {
+          "type": "string",
+          "x-go-name": "ApplicationName"
+        },
+        "applicationVersion": {
+          "type": "string",
+          "x-go-name": "ApplicationVersion"
+        }
+      },
+      "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
+    },
+    "InterestTierUpdate": {
+      "description": "InterestTierUpdate : Represents an interest update for a certain month",
+      "type": "object",
+      "required": [
+        "updateDate",
+        "marketValue",
+        "interest"
+      ],
+      "properties": {
+        "interest": {
+          "$ref": "#/definitions/Decimal64p2"
+        },
+        "marketValue": {
+          "$ref": "#/definitions/Decimal64p2"
+        },
+        "updateDate": {
+          "description": "Date when the financial instituion register the new update",
+          "type": "string",
+          "format": "date",
+          "x-go-name": "UpdateDate",
+          "example": "2020-11-10"
+        }
+      },
+      "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
+    },
+    "JSONTime": {
+      "description": "JSONTime : wrapper time to hold a specific format for a date",
+      "type": "string",
+      "format": "date-time",
+      "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
+    },
+    "LoanToValueInterestTier": {
+      "description": "LoanToValueInterestTier : Represents a Interest Tier aka ‘loan-to-value ratio’",
+      "type": "object",
+      "required": [
+        "percentage",
+        "interest"
+      ],
+      "properties": {
+        "interest": {
+          "description": "Interest rate for this Loan To Value ratio",
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Interest",
+          "example": 1.95
+        },
+        "percentage": {
+          "description": "Loan To Value ratio percentage in %",
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Percentage",
+          "example": 90
+        }
+      },
+      "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
+    },
+    "MonthPayment": {
+      "description": "MonthPayment : a Mortgage monthly payment",
+      "type": "object",
+      "properties": {
+        "interestGrossAmount": {
+          "$ref": "#/definitions/Decimal64p2"
+        },
+        "interestNetAmount": {
+          "$ref": "#/definitions/Decimal64p2"
+        },
+        "interestPercentage": {
+          "$ref": "#/definitions/Decimal64p2"
+        },
+        "loanToValueRatio": {
+          "$ref": "#/definitions/Decimal64p2"
+        },
+        "marketValue": {
+          "$ref": "#/definitions/Decimal64p2"
+        },
+        "month": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Month"
+        },
+        "paymentDate": {
+          "type": "string",
+          "format": "date",
+          "x-go-name": "PaymentDate"
+        },
+        "principal": {
+          "$ref": "#/definitions/Decimal64p2"
+        },
+        "repayment": {
+          "$ref": "#/definitions/Decimal64p2"
+        },
+        "totalGross": {
+          "$ref": "#/definitions/Decimal64p2"
+        },
+        "totalNet": {
+          "$ref": "#/definitions/Decimal64p2"
+        }
+      },
+      "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
+    },
+    "MonthlyPayments": {
+      "description": "MonthlyPayments : the response model of Mortgage monthly payments operation",
+      "type": "object",
+      "properties": {
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MonthPayment"
+          },
+          "x-go-name": "Payments"
+        },
+        "totalGrossInterest": {
+          "$ref": "#/definitions/Decimal64p2"
+        },
+        "totalNetInterest": {
+          "$ref": "#/definitions/Decimal64p2"
+        }
+      },
+      "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
+    },
+    "MonthlyPaymentsRequest": {
+      "description": "MonthlyPaymentsRequest : calculate monthly payment request object",
+      "type": "object",
+      "required": [
+        "initialPrincipal",
+        "initialInterestRate",
+        "months",
+        "startDate",
+        "incomeTax",
+        "automaticInterestUpdate"
+      ],
+      "properties": {
+        "automaticInterestUpdate": {
+          "description": "Indication if Bank updates the interest based on LoanToValue ration",
+          "type": "boolean",
+          "x-go-name": "AutomaticInterestUpdate",
+          "example": false
+        },
+        "incomeTax": {
+          "description": "Income Tax of the Mortgage payer in %",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "IncomeTax",
+          "example": 40
+        },
+        "initialInterestRate": {
+          "$ref": "#/definitions/Decimal64p2"
+        },
+        "initialPrincipal": {
+          "description": "Initial Principal lended from bank",
+          "type": "number",
+          "format": "double",
+          "x-go-name": "InitialPrincipal",
+          "example": 200000
+        },
+        "interestTierUpdates": {
+          "description": "List of Interest Tier updates during the Mortgage period",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InterestTierUpdate"
+          },
+          "x-go-name": "InterestTierUpdates"
+        },
+        "loanToValueInterestTiers": {
+          "description": "Loan To Value Interest Rate Tiers, need to be provided in case **automaticInterestUpdate** is **true**",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LoanToValueInterestTier"
+          },
+          "x-go-name": "LoanToValueInterestTiers"
+        },
+        "marketValue": {
+          "description": "Initial Market Value of the property",
+          "type": "string",
+          "format": "string",
+          "x-go-name": "MarketValue"
+        },
+        "months": {
+          "description": "Number of months to pay back the Mortgage",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Months",
+          "example": 360
+        },
+        "repayments": {
+          "description": "List of extra payments during the Mortgage period",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Repayment"
+          },
+          "x-go-name": "Repayments"
+        },
+        "startDate": {
+          "description": "Start date of the Mortgage",
+          "type": "string",
+          "format": "date",
+          "x-go-name": "StartDate",
+          "example": "2020-01-20"
+        }
+      },
+      "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
+    },
+    "Repayment": {
+      "description": "Repayment : a extra repayment during the mortgage period",
+      "type": "object",
+      "required": [
+        "date",
+        "amount"
+      ],
+      "properties": {
+        "amount": {
+          "description": "Amount of the extra repayment",
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Amount",
+          "example": 1000
+        },
+        "date": {
+          "description": "Date of the extra repayment",
+          "type": "string",
+          "format": "date",
+          "x-go-name": "Date",
+          "example": "2023-01-20"
+        }
+      },
+      "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
+    }
+  },
+  "responses": {
+    "badRequestResponse": {
+      "description": "HTTP Status 400 when something wrong with request data",
+      "schema": {
+        "$ref": "#/definitions/BadRequest"
+      }
+    },
+    "infoResponse": {
+      "description": "HTTP Status 200 with application information",
+      "schema": {
+        "$ref": "#/definitions/Info"
+      }
+    },
+    "monthlyPaymentsResponse": {
+      "description": "HTTP Status 200 with list of monthly payments",
+      "schema": {
+        "$ref": "#/definitions/MonthlyPayments"
+      }
+    }
+  }
+}
