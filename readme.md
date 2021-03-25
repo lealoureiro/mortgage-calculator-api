@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/lealoureiro/mortgage-calculator-api)](https://goreportcard.com/report/github.com/lealoureiro/mortgage-calculator-api)
+
 REST API with some tools to calculate Mortgage properties like monthly payments.
 
 At moment only supports to calculate the monthly payments of Linear Mortgage offered by most banks in The Netherlands.
