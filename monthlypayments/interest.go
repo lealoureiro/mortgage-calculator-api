@@ -52,15 +52,15 @@ func (s InterestUpdatesSet) GetInterest(month time.Time, _ float64) (float64, fl
 		}
 
 		if e.Interest != nil {
-			interest = e.Interest.AsFloat64()
-			s.currentInterest = e.Interest.AsFloat64()
+			interest = e.Interest.AsFloat()
+			s.currentInterest = e.Interest.AsFloat()
 		} else {
 			interest = s.currentInterest
 		}
 
 		if e.MarketValue != nil {
-			marketValue = e.MarketValue.AsFloat64()
-			s.marketValue = e.MarketValue.AsFloat64()
+			marketValue = e.MarketValue.AsFloat()
+			s.marketValue = e.MarketValue.AsFloat()
 		} else {
 			marketValue = s.marketValue
 		}

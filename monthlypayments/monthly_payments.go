@@ -2,14 +2,12 @@ package monthlypayments
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"sort"
 	"time"
 
 	"github.com/jinzhu/now"
 	"github.com/lealoureiro/mortgage-calculator-api/model"
-	"github.com/strongo/decimal"
 )
 
 // CalculateLinearMonthlyPayments : calculate the monthly payments for a Linear Mortgage
@@ -19,11 +17,11 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 
 	var interestSet InterestSet
 	if r.AutomaticInterestUpdate {
-		interestSet = LoanToValueInterestSet{r.MarketValue.AsFloat64(), r.LoanToValueInterestTiers}
+		interestSet = LoanToValueInterestSet{r.MarketValue.AsFloat(), r.LoanToValueInterestTiers}
 	} else {
 		interestSet = InterestUpdatesSet{
-			r.MarketValue.AsFloat64(),
-			r.InitialInterestRate.AsFloat64(),
+			r.MarketValue.AsFloat(),
+			r.InitialInterestRate.AsFloat(),
 			r.InterestTierUpdates,
 		}
 	}
@@ -63,15 +61,15 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 
 	payment.Month = 1
 	payment.PaymentDate = model.NewJSONTime(paymentDate)
-	payment.Repayment = decimal.NewDecimal64p2FromFloat64(monthlyRepayment)
-	payment.InterestGrossAmount = decimal.NewDecimal64p2FromFloat64(firstMonthInterestGross)
-	payment.InterestNetAmount = decimal.NewDecimal64p2FromFloat64(firstMonthInterestNet)
-	payment.Principal = decimal.NewDecimal64p2FromFloat64(principal)
-	payment.InterestPercentage = decimal.NewDecimal64p2FromFloat64(initialInterest * 100)
-	payment.TotalGross = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + firstMonthInterestGross)
-	payment.TotalNet = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + firstMonthInterestNet)
-	payment.LoanToValueRatio = decimal.NewDecimal64p2FromFloat64(principal / marketValue * 100)
-	payment.MarketValue = decimal.NewDecimal64p2FromFloat64(marketValue)
+	payment.Repayment = model.NewNumber(monthlyRepayment)
+	payment.InterestGrossAmount = model.NewNumber(firstMonthInterestGross)
+	payment.InterestNetAmount = model.NewNumber(firstMonthInterestNet)
+	payment.Principal = model.NewNumber(principal)
+	payment.InterestPercentage = model.NewNumber(initialInterest * 100)
+	payment.TotalGross = model.NewNumber(monthlyRepayment + firstMonthInterestGross)
+	payment.TotalNet = model.NewNumber(monthlyRepayment + firstMonthInterestNet)
+	payment.LoanToValueRatio = model.NewNumber(principal / marketValue * 100)
+	payment.MarketValue = model.NewNumber(marketValue)
 
 	result = append(result, payment)
 
@@ -103,15 +101,15 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 
 		payment.Month = i
 		payment.PaymentDate = model.NewJSONTime(currentTime)
-		payment.Repayment = decimal.NewDecimal64p2FromFloat64(monthlyRepayment)
-		payment.InterestGrossAmount = decimal.NewDecimal64p2FromFloat64(interestGrossAmount)
-		payment.InterestNetAmount = decimal.NewDecimal64p2FromFloat64(interestNetAmount)
-		payment.Principal = decimal.NewDecimal64p2FromFloat64(principal)
-		payment.InterestPercentage = decimal.NewDecimal64p2FromFloat64(interestPercentage * 100)
-		payment.TotalGross = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + interestGrossAmount)
-		payment.TotalNet = decimal.NewDecimal64p2FromFloat64(monthlyRepayment + interestNetAmount)
-		payment.LoanToValueRatio = decimal.NewDecimal64p2FromFloat64(principal / marketValue * 100)
-		payment.MarketValue = decimal.NewDecimal64p2FromFloat64(marketValue)
+		payment.Repayment = model.NewNumber(monthlyRepayment)
+		payment.InterestGrossAmount = model.NewNumber(interestGrossAmount)
+		payment.InterestNetAmount = model.NewNumber(interestNetAmount)
+		payment.Principal = model.NewNumber(principal)
+		payment.InterestPercentage = model.NewNumber(interestPercentage * 100)
+		payment.TotalGross = model.NewNumber(monthlyRepayment + interestGrossAmount)
+		payment.TotalNet = model.NewNumber(monthlyRepayment + interestNetAmount)
+		payment.LoanToValueRatio = model.NewNumber(principal / marketValue * 100)
+		payment.MarketValue = model.NewNumber(marketValue)
 
 		result = append(result, payment)
 
@@ -121,13 +119,11 @@ func CalculateLinearMonthlyPayments(r model.MonthlyPaymentsRequest) model.Monthl
 
 	return model.MonthlyPayments{
 		Payments:           result,
-		TotalGrossInterest: decimal.NewDecimal64p2FromFloat64(totalGrossInterest),
-		TotalNetInterest:   decimal.NewDecimal64p2FromFloat64(totalNetInterest)}
+		TotalGrossInterest: model.NewNumber(totalGrossInterest),
+		TotalNetInterest:   model.NewNumber(totalNetInterest)}
 }
 
 func processExtraRepayments(rp []model.Repayment, p *float64, s, e time.Time) ([]model.Repayment, float64) {
-
-	log.Printf("From %s to %s", s.String(), e.String())
 
 	if len(rp) == 0 {
 		return rp, *p
@@ -146,8 +142,6 @@ func processExtraRepayments(rp []model.Repayment, p *float64, s, e time.Time) ([
 	}
 
 	monthAveragePrincipal := totalPrincipal / float64(days)
-
-	log.Printf("Days %d, Average Principal %.2f", days, monthAveragePrincipal)
 
 	return rp, monthAveragePrincipal
 
@@ -200,7 +194,7 @@ func ValidateInputData(r model.MonthlyPaymentsRequest) (bool, string) {
 		})
 
 		initialTierPercentage := r.LoanToValueInterestTiers[len(r.LoanToValueInterestTiers)-1].Percentage / 100
-		initialRatio := r.InitialPrincipal / r.MarketValue.AsFloat64()
+		initialRatio := r.InitialPrincipal / r.MarketValue.AsFloat()
 
 		if initialRatio > initialTierPercentage {
 			return false, fmt.Sprintf("No interest tier found for initial percentage of %.2f %%", initialRatio*100)

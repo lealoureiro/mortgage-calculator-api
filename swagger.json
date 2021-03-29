@@ -77,23 +77,25 @@
       },
       "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
     },
-    "Decimal64p2": {
-      "description": "Decimal64p2 is a decimal number implementation based on int64 with 2 digits after point fixed precision",
-      "type": "integer",
-      "format": "int64",
-      "x-go-package": "github.com/strongo/decimal"
-    },
     "Info": {
       "description": "Info : the response model to show application info",
       "type": "object",
+      "required": [
+        "applicationName",
+        "applicationVersion"
+      ],
       "properties": {
         "applicationName": {
+          "description": "application name",
           "type": "string",
-          "x-go-name": "ApplicationName"
+          "x-go-name": "ApplicationName",
+          "example": "MortgageCalculatorAPI"
         },
         "applicationVersion": {
+          "description": "application version",
           "type": "string",
-          "x-go-name": "ApplicationVersion"
+          "x-go-name": "ApplicationVersion",
+          "example": "v0.0.1-1232131"
         }
       },
       "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
@@ -108,10 +110,14 @@
       ],
       "properties": {
         "interest": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "Current interest rate taking in account new LoanToValue ratio after update",
+          "x-go-name": "Interest",
+          "example": "1.70"
         },
         "marketValue": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "Market value in the moment of the update",
+          "x-go-name": "MarketValue",
+          "example": "225000"
         },
         "updateDate": {
           "description": "Date when the financial instituion register the new update",
@@ -157,43 +163,77 @@
     "MonthPayment": {
       "description": "MonthPayment : a Mortgage monthly payment",
       "type": "object",
+      "required": [
+        "month",
+        "paymentDate",
+        "repayment",
+        "interestGrossAmount",
+        "interestNetAmount",
+        "interestPercentage",
+        "principal",
+        "totalGross",
+        "totalNet",
+        "loanToValueRatio",
+        "marketValue"
+      ],
       "properties": {
         "interestGrossAmount": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "gross interest amount",
+          "x-go-name": "InterestGrossAmount",
+          "example": "300.00"
         },
         "interestNetAmount": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "Net interest amount",
+          "x-go-name": "InterestNetAmount",
+          "example": "150.00"
         },
         "interestPercentage": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "interest percentage used to calculate this monthly payment",
+          "x-go-name": "InterestPercentage",
+          "example": "1.89"
         },
         "loanToValueRatio": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "loan-to-value after this montly payment",
+          "x-go-name": "LoanToValueRatio"
         },
         "marketValue": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "current market value of the property",
+          "x-go-name": "MarketValue",
+          "example": "245000"
         },
         "month": {
+          "description": "number of the month",
           "type": "integer",
           "format": "int64",
-          "x-go-name": "Month"
+          "x-go-name": "Month",
+          "example": 1
         },
         "paymentDate": {
+          "description": "the date when the amount will paid/debited",
           "type": "string",
           "format": "date",
-          "x-go-name": "PaymentDate"
+          "x-go-name": "PaymentDate",
+          "example": "2021-03-01"
         },
         "principal": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "remaining principal of the mortgage",
+          "x-go-name": "Principal",
+          "example": "189000"
         },
         "repayment": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "amount of the reapayment for this monthly payment",
+          "x-go-name": "Repayment",
+          "example": "500.00"
         },
         "totalGross": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "total gross amount of the monthly payment",
+          "x-go-name": "TotalGross",
+          "example": "800.00"
         },
         "totalNet": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "total net amount of the montly payment",
+          "x-go-name": "TotalNet",
+          "example": "650.00"
         }
       },
       "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
@@ -201,8 +241,14 @@
     "MonthlyPayments": {
       "description": "MonthlyPayments : the response model of Mortgage monthly payments operation",
       "type": "object",
+      "required": [
+        "payments",
+        "totalGrossInterest",
+        "totalNetInterest"
+      ],
       "properties": {
         "payments": {
+          "description": "List of monthly payments of your proposed mortgage",
           "type": "array",
           "items": {
             "$ref": "#/definitions/MonthPayment"
@@ -210,10 +256,12 @@
           "x-go-name": "Payments"
         },
         "totalGrossInterest": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "Total amount of Gross Interest paid during the whole Mortgage",
+          "x-go-name": "TotalGrossInterest"
         },
         "totalNetInterest": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "Total amount of Net Interest paid during the whole Mortgage",
+          "x-go-name": "TotalNetInterest"
         }
       },
       "x-go-package": "github.com/lealoureiro/mortgage-calculator-api/model"
@@ -223,6 +271,7 @@
       "type": "object",
       "required": [
         "initialPrincipal",
+        "marketValue",
         "initialInterestRate",
         "months",
         "startDate",
@@ -237,14 +286,16 @@
           "example": false
         },
         "incomeTax": {
-          "description": "Income Tax of the Mortgage payer in %",
+          "description": "Income Tax of the Mortgage payer in %, used to calculate interest tax benefit",
           "type": "integer",
           "format": "int64",
           "x-go-name": "IncomeTax",
           "example": 40
         },
         "initialInterestRate": {
-          "$ref": "#/definitions/Decimal64p2"
+          "description": "Initial Interest Rate of the Mortgage",
+          "x-go-name": "InitialInterestRate",
+          "example": "2.0"
         },
         "initialPrincipal": {
           "description": "Initial Principal lended from bank",
@@ -271,9 +322,8 @@
         },
         "marketValue": {
           "description": "Initial Market Value of the property",
-          "type": "string",
-          "format": "string",
-          "x-go-name": "MarketValue"
+          "x-go-name": "MarketValue",
+          "example": "210000"
         },
         "months": {
           "description": "Number of months to pay back the Mortgage",

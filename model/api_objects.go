@@ -1,44 +1,8 @@
 package model
 
-import (
-	"fmt"
-	"strings"
-	"time"
-
-	"github.com/strongo/decimal"
-)
-
 // Marshaler : interface to allow a type to marshalled to JSON
 type Marshaler interface {
 	MarshalJSON() ([]byte, error)
-}
-
-// JSONTime : wrapper time to hold a specific format for a date
-//swagger:strfmt date
-type JSONTime time.Time
-
-// AsTime : unwrap primitive time type
-func (t JSONTime) AsTime() time.Time {
-	return time.Time(t)
-}
-
-// NewJSONTime : wrap primitive time type to JSONTime
-func NewJSONTime(time time.Time) JSONTime {
-	return JSONTime(time)
-}
-
-// MarshalJSON : convert a time type to string with a specific format YYYY-MM-DD
-func (t JSONTime) MarshalJSON() ([]byte, error) {
-	stamp := fmt.Sprintf("\"%s\"", time.Time(t).Format("2006-01-02"))
-	return []byte(stamp), nil
-}
-
-// UnmarshalJSON : convert date string with format YYYY-MM-DD to time.Time
-func (t *JSONTime) UnmarshalJSON(b []byte) (err error) {
-	s := strings.Trim(string(b), "\"")
-	time, err := time.Parse("2006-01-02", s)
-	*t = JSONTime(time)
-	return
 }
 
 // MonthlyPaymentsRequest : calculate monthly payment request object
@@ -55,13 +19,13 @@ type MonthlyPaymentsRequest struct {
 	//
 	// required: true
 	// example: 210000
-	MarketValue *decimal.Decimal64p2 `json:"marketValue"`
+	MarketValue *Number `json:"marketValue"`
 
 	// Initial Interest Rate of the Mortgage
 	//
 	// required: true
 	// example: 2.0
-	InitialInterestRate *decimal.Decimal64p2 `json:"initialInterestRate"`
+	InitialInterestRate *Number `json:"initialInterestRate"`
 
 	// Number of months to pay back the Mortgage
 	//
@@ -75,7 +39,7 @@ type MonthlyPaymentsRequest struct {
 	// example: 2020-01-20
 	StartDate *JSONTime `json:"startDate"`
 
-	// Income Tax of the Mortgage payer in %
+	// Income Tax of the Mortgage payer in %, used to calculate interest tax benefit
 	//
 	// required: true
 	// example: 40
@@ -128,13 +92,13 @@ type InterestTierUpdate struct {
 	//
 	// required: true
 	// example: 225000
-	MarketValue *decimal.Decimal64p2 `json:"marketValue"`
+	MarketValue *Number `json:"marketValue"`
 
 	// Current interest rate taking in account new LoanToValue ratio after update
 	//
 	// required: true
 	// example: 1.70
-	Interest *decimal.Decimal64p2 `json:"interest"`
+	Interest *Number `json:"interest"`
 }
 
 // Repayment : a extra repayment during the mortgage period
@@ -156,24 +120,91 @@ type Repayment struct {
 
 // MonthPayment : a Mortgage monthly payment
 type MonthPayment struct {
-	Month               int                 `json:"month"`
-	PaymentDate         JSONTime            `json:"paymentDate"`
-	Repayment           decimal.Decimal64p2 `json:"repayment"`
-	InterestGrossAmount decimal.Decimal64p2 `json:"interestGrossAmount"`
-	InterestNetAmount   decimal.Decimal64p2 `json:"interestNetAmount"`
-	InterestPercentage  decimal.Decimal64p2 `json:"interestPercentage"`
-	Principal           decimal.Decimal64p2 `json:"principal"`
-	TotalGross          decimal.Decimal64p2 `json:"totalGross"`
-	TotalNet            decimal.Decimal64p2 `json:"totalNet"`
-	LoanToValueRatio    decimal.Decimal64p2 `json:"loanToValueRatio"`
-	MarketValue         decimal.Decimal64p2 `json:"marketValue"`
+
+	// number of the month
+	//
+	// required: true
+	// example: 1
+	Month int `json:"month"`
+
+	// the date when the amount will paid/debited
+	//
+	// required: true
+	// example: 2021-03-01
+	PaymentDate JSONTime `json:"paymentDate"`
+
+	// amount of the reapayment for this monthly payment
+	//
+	// required: true
+	// example: 500.00
+	Repayment Number `json:"repayment"`
+
+	// gross interest amount
+	//
+	// required: true
+	// example: 300.00
+	InterestGrossAmount Number `json:"interestGrossAmount"`
+
+	// Net interest amount
+	//
+	// required: true
+	// example: 150.00
+	InterestNetAmount Number `json:"interestNetAmount"`
+
+	// interest percentage used to calculate this monthly payment
+	//
+	// required: true
+	// example: 1.89
+	InterestPercentage Number `json:"interestPercentage"`
+
+	// remaining principal of the mortgage
+	//
+	// required: true
+	// example: 189000
+	Principal Number `json:"principal"`
+
+	// total gross amount of the monthly payment
+	//
+	// required: true
+	// example: 800.00
+	TotalGross Number `json:"totalGross"`
+
+	// total net amount of the montly payment
+	//
+	// required: true
+	// example: 650.00
+	TotalNet Number `json:"totalNet"`
+
+	// loan-to-value after this montly payment
+	//
+	// required: true
+	// example 0.87
+	LoanToValueRatio Number `json:"loanToValueRatio"`
+
+	// current market value of the property
+	//
+	// required: true
+	// example: 245000
+	MarketValue Number `json:"marketValue"`
 }
 
 // MonthlyPayments : the response model of Mortgage monthly payments operation
 type MonthlyPayments struct {
-	Payments           []MonthPayment      `json:"payments"`
-	TotalGrossInterest decimal.Decimal64p2 `json:"totalGrossInterest"`
-	TotalNetInterest   decimal.Decimal64p2 `json:"totalNetInterest"`
+
+	// List of monthly payments of your proposed mortgage
+	//
+	// required: true
+	Payments []MonthPayment `json:"payments"`
+
+	// Total amount of Gross Interest paid during the whole Mortgage
+	//
+	// required: true
+	TotalGrossInterest Number `json:"totalGrossInterest"`
+
+	// Total amount of Net Interest paid during the whole Mortgage
+	//
+	// required: true
+	TotalNetInterest Number `json:"totalNetInterest"`
 }
 
 // BadRequest : the response model to hold response for a bad request
@@ -183,6 +214,16 @@ type BadRequest struct {
 
 // Info : the response model to show application info
 type Info struct {
-	ApplicationName    string `json:"applicationName"`
+
+	// application name
+	//
+	// required: true
+	// example: MortgageCalculatorAPI
+	ApplicationName string `json:"applicationName"`
+
+	// application version
+	//
+	// required: true
+	// example: v0.0.1-1232131
 	ApplicationVersion string `json:"applicationVersion"`
 }

@@ -44,7 +44,7 @@ func MonthlyPayments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Calculating monthly payments for %.2f for property with initial market value %.2f to be paid in %d months with automatic updates %v and Extra Repayments %v", rb.InitialPrincipal, rb.MarketValue.AsFloat64(), rb.Months, rb.AutomaticInterestUpdate, rb.Repayments)
+	log.Printf("Calculating monthly payments for %.2f for property with initial market value %.2f to be paid in %d months with automatic updates %v and Extra Repayments %v", rb.InitialPrincipal, rb.MarketValue.AsFloat(), rb.Months, rb.AutomaticInterestUpdate, rb.Repayments)
 
 	mps := monthlypayments.CalculateLinearMonthlyPayments(rb)
 
