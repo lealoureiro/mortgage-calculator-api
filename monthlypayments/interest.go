@@ -47,7 +47,7 @@ func (s InterestUpdatesSet) GetInterest(month time.Time, _ float64) (float64, fl
 
 	for _, e := range s.interestTiers {
 
-		if e.UpdateDate.AsTime().AddDate(0, -1, 0).After(month) {
+		if e.UpdateDate.AsTime().After(month) {
 			return s.currentInterest / 100, s.marketValue
 		}
 
